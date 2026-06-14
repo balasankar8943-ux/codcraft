@@ -8,10 +8,6 @@ begin;
 -- 1. Extend student_profiles with gamification columns
 alter table public.student_profiles
   add column if not exists xp integer not null default 0,
-  add column if not exists current_streak integer not null default 0,
-  add column if not exists best_streak integer not null default 0,
-  add column if not exists last_active_date date,
-  add column if not exists streak_freezes integer not null default 1,
   add column if not exists badges text[] not null default '{}'::text[],
   add column if not exists diagnostic_completed boolean not null default false;
 
@@ -62,9 +58,6 @@ begin
     college,
     level,
     xp,
-    current_streak,
-    best_streak,
-    streak_freezes,
     badges,
     diagnostic_completed
   )
@@ -82,9 +75,6 @@ begin
     ),
     coalesce(new.raw_user_meta_data ->> 'level', 'beginner'),
     0,
-    0,
-    0,
-    1,
     '{}'::text[],
     false
   )
