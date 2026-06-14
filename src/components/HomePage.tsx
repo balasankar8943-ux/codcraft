@@ -145,10 +145,6 @@ const HomePage: React.FC = () => {
       const dbDiagnosticCompleted = profile?.diagnostic_completed || false;
       const uid = user.id;
 
-      if (dbDiagnosticCompleted) {
-        localStorage.setItem(`codcraft_diagnostic_completed_${uid}`, 'true');
-      }
-
       // 2. Fetch progress score (XP) and solved questions list
       let { data: progress, error: progErr } = await supabase
         .from('student_progress')
@@ -193,8 +189,29 @@ const HomePage: React.FC = () => {
       setIsSandbox(false);
       setDbError(null);
 
+      // Determine if they are already onboarded by active participation
+      const solvedQsList = progress?.solved_questions || [];
+      const hasSolvedQuestions = Array.isArray(solvedQsList) && solvedQsList.length > 0;
+      
+      const isAlreadyOnboarded = dbDiagnosticCompleted || 
+                                 finalProgressLevel !== 'beginner' || 
+                                 finalXp > 0 || 
+                                 hasSolvedQuestions;
+
+      if (isAlreadyOnboarded) {
+        localStorage.setItem(`codcraft_diagnostic_completed_${uid}`, 'true');
+        if (!dbDiagnosticCompleted) {
+          // Sync back to database silently
+          supabase
+            .from('student_profiles')
+            .update({ diagnostic_completed: true })
+            .eq('id', uid)
+            .then(() => {});
+        }
+      }
+
       // Check if diagnostic onboarding has been completed
-      const diagnosticCompleted = dbDiagnosticCompleted || localStorage.getItem(`codcraft_diagnostic_completed_${uid}`) === 'true';
+      const diagnosticCompleted = isAlreadyOnboarded || localStorage.getItem(`codcraft_diagnostic_completed_${uid}`) === 'true';
       if (!diagnosticCompleted) {
         setShowOnboard(true);
       }
@@ -214,8 +231,12 @@ const HomePage: React.FC = () => {
       setFullName(user.email ? user.email.split('@')[0] : 'Sandbox Coder');
       setBadges(JSON.parse(localStorage.getItem(`codcraft_badges_${uid}`) || '[]'));
 
-      const diagnosticCompleted = localStorage.getItem(`codcraft_diagnostic_completed_${uid}`) === 'true';
-      if (!diagnosticCompleted) {
+      const diagnosticCompleted = localStorage.getItem(`codcraft_diagnostic_completed_${uid}`) === 'true' || 
+                                  llvl !== 'beginner' || 
+                                  lxp > 0;
+      if (diagnosticCompleted) {
+        localStorage.setItem(`codcraft_diagnostic_completed_${uid}`, 'true');
+      } else {
         setShowOnboard(true);
       }
 
