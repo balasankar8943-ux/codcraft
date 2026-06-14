@@ -433,7 +433,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
 
       {/* ── Sticky Header ───────────────────────────────────── */}
       <header className="app-header">
@@ -647,11 +647,11 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="dashboard-layout" style={{ display: 'block' }}>
+        <div className="dashboard-layout" style={{ display: 'block', padding: '1.5rem' }}>
           {/* Global Leaderboard Standings Page */}
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <div className="card card-p">
-              <div className="flex justify-between items-center mb-4" style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+            <div className="card card-p leaderboard-page-wrap">
+              <div className="flex justify-between items-center mb-4" style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <h2 style={{ fontSize: '1.35rem', color: 'var(--text)', fontWeight: 800 }}>
                   Global Leaderboard Standings
                 </h2>

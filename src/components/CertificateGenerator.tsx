@@ -386,10 +386,13 @@ const CertificateGenerator: React.FC<Props> = ({ xp }) => {
         </div>
       </div>
 
-      <div className="cert-layout">
+
+      {/* Two-col layout: cert-layout class handles responsive stacking in styles.css */}
+      <div className="cert-layout cert-two-col" style={{ minWidth: 0 }}>
         
         {/* Certificate Display & Preview (Left Pane) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', minWidth: 0, overflow: 'hidden' }}>
+
           <div className="cert-tier-tabs">
             {(['bronze', 'silver', 'gold'] as const).map(lvl => {
               const cfg = getLevelConfig(lvl);
@@ -528,7 +531,8 @@ const CertificateGenerator: React.FC<Props> = ({ xp }) => {
         </div>
 
         {/* Certificate Sidebar Settings (Right Pane) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', minWidth: 0 }}>
+
           <div className="card card-p flex flex-col gap-4">
             <h3 style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <User size={14} className="text-indigo" /> Certificate Settings
