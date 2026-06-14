@@ -30,7 +30,10 @@ const OnboardLevel: React.FC<Props> = ({ onClose, onSaved }) => {
     try {
       const { error: dbError } = await supabase
         .from('student_profiles')
-        .update({ level: assignedLevel })
+        .update({ 
+          level: assignedLevel,
+          diagnostic_completed: true
+        })
         .eq('id', user.id);
 
       if (dbError) throw dbError;

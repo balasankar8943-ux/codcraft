@@ -104,28 +104,60 @@ const HomePage: React.FC = () => {
   const fetchProfile = async () => {
     if (!user) return;
     try {
-      // 1. Fetch profile level, full_name, college
-      const { data: profile, error: profileErr } = await supabase
+      // 1. Fetch profile level, full_name, college, diagnostic_completed
+      let { data: profile, error: profileErr } = await supabase
         .from('student_profiles')
-        .select('full_name, college, level')
+        .select('full_name, college, level, diagnostic_completed')
         .eq('id', user.id)
         .single();
         
-      if (profileErr) throw profileErr;
+      if (profileErr) {
+        if (profileErr.code === 'PGRST116') {
+          // Auto create missing profile row
+          const emailPrefix = user.email ? user.email.split('@')[0] : 'Student';
+          const formattedName = emailPrefix.split(/[-_.]/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+          
+          const { data: newProfile, error: createProfileErr } = await supabase
+            .from('student_profiles')
+            .insert({
+              id: user.id,
+              email: user.email || '',
+              full_name: formattedName,
+              college: 'Kerala Engineering Student',
+              level: 'beginner',
+              diagnostic_completed: false
+            })
+            .select('full_name, college, level, diagnostic_completed')
+            .single();
+            
+          if (createProfileErr) throw createProfileErr;
+          profile = newProfile;
+        } else {
+          throw profileErr;
+        }
+      }
 
       if (profile) {
         setFullName(profile.full_name || '');
       }
       
+      const finalLevel = profile?.level || 'beginner';
+      const dbDiagnosticCompleted = profile?.diagnostic_completed || false;
+      const uid = user.id;
+
+      if (dbDiagnosticCompleted) {
+        localStorage.setItem(`codcraft_diagnostic_completed_${uid}`, 'true');
+      }
+
       // 2. Fetch progress score (XP) and solved questions list
-      const { data: progress, error: progErr } = await supabase
+      let { data: progress, error: progErr } = await supabase
         .from('student_progress')
         .select('score, level, solved_questions')
         .eq('email', user.email)
         .single();
         
       let finalXp = 0;
-      let finalLevel = profile.level || 'beginner';
+      let finalProgressLevel = finalLevel;
 
       if (progErr) {
         if (progErr.code === 'PGRST116') {
@@ -133,40 +165,41 @@ const HomePage: React.FC = () => {
           const { data: newProg, error: createErr } = await supabase
             .from('student_progress')
             .insert({
-              email: user.email,
+              email: user.email || '',
               level: finalLevel,
               score: 0,
               solved_questions: []
             })
-            .select('*')
+            .select('score, level, solved_questions')
             .single();
-          if (!createErr && newProg) {
-            finalXp = newProg.score ?? 0;
-          }
+            
+          if (createErr) throw createErr;
+          progress = newProg;
         } else {
           throw progErr;
         }
-      } else {
+      }
+
+      if (progress) {
         finalXp = progress.score ?? 0;
-        finalLevel = progress.level || profile.level || 'beginner';
+        finalProgressLevel = progress.level || finalLevel;
       }
 
       setXp(finalXp);
-      setLevel(finalLevel);
+      setLevel(finalProgressLevel);
 
       // Load local gamification badges fallback
-      const uid = user.id;
       setBadges(JSON.parse(localStorage.getItem(`codcraft_badges_${uid}`) || '[]'));
       setIsSandbox(false);
       setDbError(null);
 
       // Check if diagnostic onboarding has been completed
-      const diagnosticCompleted = localStorage.getItem(`codcraft_diagnostic_completed_${uid}`) === 'true';
+      const diagnosticCompleted = dbDiagnosticCompleted || localStorage.getItem(`codcraft_diagnostic_completed_${uid}`) === 'true';
       if (!diagnosticCompleted) {
         setShowOnboard(true);
       }
 
-      fetchRecentSubs(finalLevel);
+      fetchRecentSubs(finalProgressLevel);
 
     } catch (err: any) {
       console.warn("Supabase profile sync failed, running in local fallback mode:", err.message);
