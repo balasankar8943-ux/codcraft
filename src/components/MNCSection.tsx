@@ -7,11 +7,13 @@ import questionsData from '../data/questions.json';
 
 type Question = {
   id: number;
+  title: string;
   level: string;
   category: string;
   company?: string;
   content: string;
-  answer: string;
+  templates: Record<string, string>;
+  testCases: Array<{ input: string; output: string }>;
   xp_reward: number;
 };
 
@@ -33,7 +35,7 @@ const MNCSection: React.FC<Props> = ({ onAnswered }) => {
       if (!user) return;
       
       // Filter questions belonging to category 'mnc'
-      const mncQuestions = (questionsData as any).questions.filter(
+      const mncQuestions = (questionsData as any).coding.filter(
         (q: Question) => q.category === 'mnc'
       );
       setQuestions(mncQuestions);
@@ -62,7 +64,7 @@ const MNCSection: React.FC<Props> = ({ onAnswered }) => {
     
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('student_profiles')
         .select('xp, level')
         .eq('id', user.id)
         .single();
@@ -90,7 +92,7 @@ const MNCSection: React.FC<Props> = ({ onAnswered }) => {
     localStorage.setItem(`codcraft_level_${user.id}`, newLevel);
 
     try {
-      await supabase.from('users').update({ xp: newXp, level: newLevel }).eq('id', user.id);
+      await supabase.from('student_profiles').update({ xp: newXp, level: newLevel }).eq('id', user.id);
     } catch (err) {
       console.warn("Failed to sync standalone XP to database:", err);
     }
@@ -104,18 +106,6 @@ const MNCSection: React.FC<Props> = ({ onAnswered }) => {
     }
   };
 
-  const getCompanyColor = (company?: string) => {
-    switch (company?.toLowerCase()) {
-      case 'google': return '#4285F4';
-      case 'amazon': return '#FF9900';
-      case 'microsoft': return '#F25022';
-      case 'tcs': return '#3b82f6';
-      case 'infosys': return '#007cc3';
-      case 'wipro': return '#a855f7';
-      default: return 'var(--primary)';
-    }
-  };
-
   if (loading) return <p>Loading MNC questions...</p>;
   if (questions.length === 0) return <p>No MNC questions available right now.</p>;
 
@@ -123,7 +113,7 @@ const MNCSection: React.FC<Props> = ({ onAnswered }) => {
     <div>
       <div style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.4rem', marginBottom: '0.25rem' }}>MNC Placement Prep</h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+        <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
           Crack real interview questions asked by top multinational corporations recruitment processes.
         </p>
       </div>
@@ -144,33 +134,16 @@ const MNCSection: React.FC<Props> = ({ onAnswered }) => {
       {/* Question list */}
       {filteredQuestions.length === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: 'var(--text-secondary)' }}>No placement questions found for {selectedCompany}. Check back soon!</p>
+          <p style={{ color: 'var(--muted)' }}>No placement questions found for {selectedCompany}. Check back soon!</p>
         </div>
       ) : (
         <div className="question-list">
           {filteredQuestions.map(q => (
-            <div key={q.id} style={{ position: 'relative' }}>
-              {/* Company indicator tag floating top right */}
-              <div style={{
-                position: 'absolute',
-                top: '1.5rem',
-                right: '1.5rem',
-                zIndex: 5
-              }}>
-                <span className="company-badge" style={{
-                  borderColor: getCompanyColor(q.company),
-                  color: getCompanyColor(q.company),
-                  background: 'rgba(255, 255, 255, 0.03)'
-                }}>
-                  🏢 {q.company}
-                </span>
-                <span className={`badge badge-${q.level}`} style={{ marginLeft: '0.5rem', fontSize: '0.7rem' }}>
-                  {q.level}
-                </span>
-              </div>
-              
-              <QuestionItem question={q} onAnswered={() => handleAnswerSolved(q.xp_reward)} />
-            </div>
+            <QuestionItem 
+              key={q.id} 
+              question={q} 
+              onAnswered={(xpChange) => handleAnswerSolved(xpChange)} 
+            />
           ))}
         </div>
       )}

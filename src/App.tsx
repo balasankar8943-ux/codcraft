@@ -3,8 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './components/AuthProvider';
 import LoginSignUp from './components/LoginSignUp';
 import HomePage from './components/HomePage';
-import Leaderboard from './components/Leaderboard';
-import MNCSection from './components/MNCSection';
 
 const App: React.FC = () => {
   const { user } = useAuth();
@@ -28,7 +26,7 @@ const App: React.FC = () => {
         path="/leaderboard"
         element={
           <ProtectedRoute>
-            <Leaderboard />
+            <HomePage />
           </ProtectedRoute>
         }
       />
@@ -36,7 +34,15 @@ const App: React.FC = () => {
         path="/mnc"
         element={
           <ProtectedRoute>
-            <MNCSection />
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/certificates"
+        element={
+          <ProtectedRoute>
+            <HomePage />
           </ProtectedRoute>
         }
       />

@@ -1,130 +1,2360 @@
 {
-  "questions": [
+  "diagnostic": [
     {
       "id": 1,
-      "level": "beginner",
-      "category": "general",
-      "content": "In JavaScript, which operator is used for strict comparison (checks both value and type)?",
-      "answer": "===",
-      "xp_reward": 15
+      "topic": "Loops",
+      "type": "mcq",
+      "content": "What is the output of the following JavaScript code snippet?\n\nlet sum = 0;\nfor (let i = 1; i <= 4; i++) {\n  if (i === 3) continue;\n  sum += i;\n}\nconsole.log(sum);",
+      "options": [
+        "10",
+        "7",
+        "6",
+        "9"
+      ],
+      "answer": "7"
     },
     {
       "id": 2,
-      "level": "beginner",
-      "category": "general",
-      "content": "Write the exact Python code to print 'Hello World' to the console.",
-      "answer": "print(\"Hello World\")",
-      "xp_reward": 10
+      "topic": "Arrays",
+      "type": "mcq",
+      "content": "In Python, what is the output of the following list operation?\n\nnums = [1, 2, 3, 4, 5]\nprint(nums[1:4])",
+      "options": [
+        "[2, 3, 4]",
+        "[1, 2, 3]",
+        "[2, 3, 4, 5]",
+        "[1, 2, 3, 4]"
+      ],
+      "answer": "[2, 3, 4]"
     },
     {
       "id": 3,
-      "level": "beginner",
-      "category": "general",
-      "content": "Which HTML tag is used to link an external JavaScript file?",
-      "answer": "<script>",
-      "xp_reward": 10
+      "topic": "Functions",
+      "type": "mcq",
+      "content": "What value is printed by this JavaScript code snippet demonstrating closures?\n\nfunction makeCounter() {\n  let count = 0;\n  return function() {\n    return ++count;\n  };\n}\nconst counter = makeCounter();\ncounter();\nconsole.log(counter());",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "Undefined"
+      ],
+      "answer": "2"
     },
     {
       "id": 4,
-      "level": "mid",
-      "category": "general",
-      "content": "Write a short JavaScript expression to reverse the string variable 'str' (Hint: use split, reverse, and join methods).",
-      "answer": "str.split('').reverse().join('')",
-      "xp_reward": 25
+      "topic": "OOP",
+      "type": "mcq",
+      "content": "Which concept in Object-Oriented Programming (OOP) allows a class to inherit properties and behavior from another class?",
+      "options": [
+        "Polymorphism",
+        "Encapsulation",
+        "Inheritance",
+        "Abstraction"
+      ],
+      "answer": "Inheritance"
     },
     {
       "id": 5,
-      "level": "mid",
-      "category": "general",
-      "content": "In Python, what keyword is used to define a function?",
-      "answer": "def",
-      "xp_reward": 15
+      "topic": "Loops",
+      "type": "mcq",
+      "content": "How many times will the following loop execute?\n\nint x = 5;\nwhile (x > 0) {\n  x -= 2;\n}",
+      "options": [
+        "2 times",
+        "3 times",
+        "5 times",
+        "Infinite"
+      ],
+      "answer": "3 times"
     },
     {
       "id": 6,
-      "level": "mid",
-      "category": "general",
-      "content": "What is the average time complexity of searching for an element in a balanced Binary Search Tree?",
-      "answer": "O(log n)",
-      "xp_reward": 20
+      "topic": "Arrays",
+      "type": "mcq",
+      "content": "What is the index of element 'C' in the array `arr = ['A', 'B', 'C', 'D']`?",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "answer": "2"
     },
     {
       "id": 7,
-      "level": "pro",
-      "category": "general",
-      "content": "In database security, what is the primary coding technique used to prevent SQL Injection attacks?",
-      "answer": "parameterized queries",
-      "xp_reward": 30
+      "topic": "Functions & Recursion",
+      "type": "mcq",
+      "content": "What is the return value of `factorial(3)` given this function definition?\n\nfunction factorial(n) {\n  if (n <= 1) return 1;\n  return n * factorial(n - 1);\n}",
+      "options": [
+        "3",
+        "6",
+        "9",
+        "2"
+      ],
+      "answer": "6"
     },
     {
       "id": 8,
-      "level": "pro",
+      "topic": "OOP",
+      "type": "mcq",
+      "content": "What is the output of the following Java snippet?\n\nclass Animal {\n  void sound() { System.out.print(\"Growl \"); }\n}\nclass Dog extends Animal {\n  void sound() { System.out.print(\"Bark \"); }\n}\nAnimal pet = new Dog();\npet.sound();",
+      "options": [
+        "Growl",
+        "Bark",
+        "Growl Bark",
+        "Compilation Error"
+      ],
+      "answer": "Bark"
+    }
+  ],
+  "coding": [
+    {
+      "id": 101,
+      "title": "Even or Odd",
+      "level": "beginner",
       "category": "general",
-      "content": "Which design pattern restricts the instantiation of a class to one single instance?",
-      "answer": "singleton",
-      "xp_reward": 30
+      "company": "Cognizant",
+      "content": "Write a program for the challenge: Even or Odd.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "4",
+          "output": "Even"
+        },
+        {
+          "input": "7",
+          "output": "Odd"
+        }
+      ]
     },
     {
-      "id": 9,
-      "level": "pro",
-      "category": "general",
-      "content": "Explain what a closures is in JavaScript (keep it concise).",
-      "answer": "A function that retains access to its outer lexical scope even when executed outside that scope.",
-      "xp_reward": 35
+      "id": 102,
+      "title": "Sum to N",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Google",
+      "content": "Write a program for the challenge: Sum to N.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "15"
+        },
+        {
+          "input": "10",
+          "output": "55"
+        }
+      ]
     },
     {
-      "id": 10,
+      "id": 103,
+      "title": "Multiply Two",
+      "level": "beginner",
+      "category": "general",
+      "company": "Amazon",
+      "content": "Write a program for the challenge: Multiply Two.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "3\n4",
+          "output": "12"
+        },
+        {
+          "input": "5\n6",
+          "output": "30"
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "title": "Area of Circle",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Microsoft",
+      "content": "Write a program for the challenge: Area of Circle.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 105,
+      "title": "Celsius to Fahrenheit",
+      "level": "beginner",
+      "category": "general",
+      "company": "TCS",
+      "content": "Write a program for the challenge: Celsius to Fahrenheit.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 106,
+      "title": "Max of Two",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Infosys",
+      "content": "Write a program for the challenge: Max of Two.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 107,
+      "title": "Min of Three",
+      "level": "beginner",
+      "category": "general",
+      "company": "Wipro",
+      "content": "Write a program for the challenge: Min of Three.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 108,
+      "title": "Leap Year",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Cognizant",
+      "content": "Write a program for the challenge: Leap Year.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 109,
+      "title": "Absolute Value",
+      "level": "beginner",
+      "category": "general",
+      "company": "Google",
+      "content": "Write a program for the challenge: Absolute Value.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 110,
+      "title": "Swap Two",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Amazon",
+      "content": "Write a program for the challenge: Swap Two.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 111,
+      "title": "Print 1 to 10",
+      "level": "beginner",
+      "category": "general",
+      "company": "Microsoft",
+      "content": "Write a program for the challenge: Print 1 to 10.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 112,
+      "title": "Sum of Evens",
       "level": "beginner",
       "category": "mnc",
       "company": "TCS",
-      "content": "In C programming, write a condition to check if an integer variable 'num' is even using the modulo operator (e.g. num % 2 == 0).",
-      "answer": "num % 2 == 0",
-      "xp_reward": 20
+      "content": "Write a program for the challenge: Sum of Evens.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
     },
     {
-      "id": 11,
+      "id": 113,
+      "title": "Count Digits",
+      "level": "beginner",
+      "category": "general",
+      "company": "Infosys",
+      "content": "Write a program for the challenge: Count Digits.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 114,
+      "title": "Reverse Integer",
       "level": "beginner",
       "category": "mnc",
       "company": "Wipro",
-      "content": "Which structural data type in Java is used to handle multiple values of the same type in a single variable?",
-      "answer": "array",
-      "xp_reward": 15
+      "content": "Write a program for the challenge: Reverse Integer.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
     },
     {
-      "id": 12,
-      "level": "mid",
+      "id": 115,
+      "title": "Power of Number",
+      "level": "beginner",
+      "category": "general",
+      "company": "Cognizant",
+      "content": "Write a program for the challenge: Power of Number.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 116,
+      "title": "Number Sign",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Google",
+      "content": "Write a program for the challenge: Number Sign.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 117,
+      "title": "Grade Check",
+      "level": "beginner",
+      "category": "general",
+      "company": "Amazon",
+      "content": "Write a program for the challenge: Grade Check.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 118,
+      "title": "Simple Calculator",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Microsoft",
+      "content": "Write a program for the challenge: Simple Calculator.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 119,
+      "title": "ASCII Finder",
+      "level": "beginner",
+      "category": "general",
+      "company": "TCS",
+      "content": "Write a program for the challenge: ASCII Finder.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 120,
+      "title": "String Length",
+      "level": "beginner",
       "category": "mnc",
       "company": "Infosys",
-      "content": "What SQL keyword is used to sort the result-set in descending order?",
-      "answer": "desc",
-      "xp_reward": 20
+      "content": "Write a program for the challenge: String Length.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
     },
     {
-      "id": 13,
+      "id": 121,
+      "title": "String Concatenate",
+      "level": "beginner",
+      "category": "general",
+      "company": "Wipro",
+      "content": "Write a program for the challenge: String Concatenate.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 122,
+      "title": "Character Index",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Cognizant",
+      "content": "Write a program for the challenge: Character Index.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 123,
+      "title": "Uppercase Convert",
+      "level": "beginner",
+      "category": "general",
+      "company": "Google",
+      "content": "Write a program for the challenge: Uppercase Convert.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 124,
+      "title": "Is Vowel",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Amazon",
+      "content": "Write a program for the challenge: Is Vowel.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 125,
+      "title": "Count Vowels",
+      "level": "beginner",
+      "category": "general",
+      "company": "Microsoft",
+      "content": "Write a program for the challenge: Count Vowels.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 126,
+      "title": "Array Print",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "TCS",
+      "content": "Write a program for the challenge: Array Print.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 127,
+      "title": "Array Min",
+      "level": "beginner",
+      "category": "general",
+      "company": "Infosys",
+      "content": "Write a program for the challenge: Array Min.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 128,
+      "title": "Array Index Finder",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Wipro",
+      "content": "Write a program for the challenge: Array Index Finder.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 129,
+      "title": "Array Occurrences",
+      "level": "beginner",
+      "category": "general",
+      "company": "Cognizant",
+      "content": "Write a program for the challenge: Array Occurrences.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 130,
+      "title": "Square Array",
+      "level": "beginner",
+      "category": "mnc",
+      "company": "Google",
+      "content": "Write a program for the challenge: Square Array.\n\nInput Format: Standard input variables.\nOutput Format: Print the result.",
+      "xp_reward": 15,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code here\n    # Read from sys.stdin\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code here",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    // Write C++ code here\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n        // Write Java code here\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "10",
+          "output": "20"
+        },
+        {
+          "input": "5",
+          "output": "10"
+        }
+      ]
+    },
+    {
+      "id": 201,
+      "title": "Fibonacci",
+      "level": "mid",
+      "category": "general",
+      "company": "Amazon",
+      "content": "Implement intermediate algorithm: Fibonacci.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "4",
+          "output": "3"
+        },
+        {
+          "input": "6",
+          "output": "8"
+        }
+      ]
+    },
+    {
+      "id": 202,
+      "title": "Valid Parentheses",
       "level": "mid",
       "category": "mnc",
       "company": "Microsoft",
-      "content": "What fundamental linear data structure operates on a Last-In, First-Out (LIFO) access pattern?",
-      "answer": "stack",
-      "xp_reward": 25
+      "content": "Implement intermediate algorithm: Valid Parentheses.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "()[]{}",
+          "output": "true"
+        },
+        {
+          "input": "(]",
+          "output": "false"
+        }
+      ]
     },
     {
-      "id": 14,
+      "id": 203,
+      "title": "Factorial Recursion",
+      "level": "mid",
+      "category": "general",
+      "company": "TCS",
+      "content": "Implement intermediate algorithm: Factorial Recursion.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 204,
+      "title": "Reverse Array",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Infosys",
+      "content": "Implement intermediate algorithm: Reverse Array.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 205,
+      "title": "Check Prime",
+      "level": "mid",
+      "category": "general",
+      "company": "Wipro",
+      "content": "Implement intermediate algorithm: Check Prime.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 206,
+      "title": "Greatest Common Divisor",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Cognizant",
+      "content": "Implement intermediate algorithm: Greatest Common Divisor.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 207,
+      "title": "Least Common Multiple",
+      "level": "mid",
+      "category": "general",
+      "company": "Google",
+      "content": "Implement intermediate algorithm: Least Common Multiple.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 208,
+      "title": "Palindrome Check",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Amazon",
+      "content": "Implement intermediate algorithm: Palindrome Check.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 209,
+      "title": "Second Largest",
+      "level": "mid",
+      "category": "general",
+      "company": "Microsoft",
+      "content": "Implement intermediate algorithm: Second Largest.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 210,
+      "title": "Binary Search",
+      "level": "mid",
+      "category": "mnc",
+      "company": "TCS",
+      "content": "Implement intermediate algorithm: Binary Search.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 211,
+      "title": "Bubble Sort",
+      "level": "mid",
+      "category": "general",
+      "company": "Infosys",
+      "content": "Implement intermediate algorithm: Bubble Sort.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 212,
+      "title": "Linear Search",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Wipro",
+      "content": "Implement intermediate algorithm: Linear Search.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 213,
+      "title": "Merge Arrays",
+      "level": "mid",
+      "category": "general",
+      "company": "Cognizant",
+      "content": "Implement intermediate algorithm: Merge Arrays.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 214,
+      "title": "Anagram Check",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Google",
+      "content": "Implement intermediate algorithm: Anagram Check.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 215,
+      "title": "Remove Duplicates",
+      "level": "mid",
+      "category": "general",
+      "company": "Amazon",
+      "content": "Implement intermediate algorithm: Remove Duplicates.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 216,
+      "title": "Count Words",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Microsoft",
+      "content": "Implement intermediate algorithm: Count Words.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 217,
+      "title": "Substring Find",
+      "level": "mid",
+      "category": "general",
+      "company": "TCS",
+      "content": "Implement intermediate algorithm: Substring Find.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 218,
+      "title": "Matrix Transpose",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Infosys",
+      "content": "Implement intermediate algorithm: Matrix Transpose.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 219,
+      "title": "Recursive Digits Sum",
+      "level": "mid",
+      "category": "general",
+      "company": "Wipro",
+      "content": "Implement intermediate algorithm: Recursive Digits Sum.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 220,
+      "title": "Recursive Power",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Cognizant",
+      "content": "Implement intermediate algorithm: Recursive Power.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 221,
+      "title": "Tree Leaf Count",
+      "level": "mid",
+      "category": "general",
+      "company": "Google",
+      "content": "Implement intermediate algorithm: Tree Leaf Count.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 222,
+      "title": "Tree Height",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Amazon",
+      "content": "Implement intermediate algorithm: Tree Height.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 223,
+      "title": "Stack Push Pop",
+      "level": "mid",
+      "category": "general",
+      "company": "Microsoft",
+      "content": "Implement intermediate algorithm: Stack Push Pop.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 224,
+      "title": "Queue Simulation",
+      "level": "mid",
+      "category": "mnc",
+      "company": "TCS",
+      "content": "Implement intermediate algorithm: Queue Simulation.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 225,
+      "title": "BST Search",
+      "level": "mid",
+      "category": "general",
+      "company": "Infosys",
+      "content": "Implement intermediate algorithm: BST Search.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 226,
+      "title": "Intersection of Arrays",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Wipro",
+      "content": "Implement intermediate algorithm: Intersection of Arrays.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 227,
+      "title": "Sentence Word Reverse",
+      "level": "mid",
+      "category": "general",
+      "company": "Cognizant",
+      "content": "Implement intermediate algorithm: Sentence Word Reverse.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 228,
+      "title": "Is Array Sorted",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Google",
+      "content": "Implement intermediate algorithm: Is Array Sorted.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 229,
+      "title": "Missing Number Finder",
+      "level": "mid",
+      "category": "general",
+      "company": "Amazon",
+      "content": "Implement intermediate algorithm: Missing Number Finder.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 230,
+      "title": "Selection Sort",
+      "level": "mid",
+      "category": "mnc",
+      "company": "Microsoft",
+      "content": "Implement intermediate algorithm: Selection Sort.\n\nInput Format: Standard input arguments.\nOutput Format: Output the computed value.",
+      "xp_reward": 25,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "5",
+          "output": "120"
+        },
+        {
+          "input": "3",
+          "output": "6"
+        }
+      ]
+    },
+    {
+      "id": 301,
+      "title": "Max Subarray Sum",
+      "level": "pro",
+      "category": "general",
+      "company": "TCS",
+      "content": "Solve advanced algorithmic problem: Max Subarray Sum.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "9\n-2 1 -3 4 -1 2 1 -5 4",
+          "output": "6"
+        },
+        {
+          "input": "5\n5 4 -1 7 8",
+          "output": "23"
+        }
+      ]
+    },
+    {
+      "id": 302,
+      "title": "Coin Change",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Infosys",
+      "content": "Solve advanced algorithmic problem: Coin Change.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "3 11\n1 2 5",
+          "output": "3"
+        },
+        {
+          "input": "1 3\n2",
+          "output": "-1"
+        }
+      ]
+    },
+    {
+      "id": 303,
+      "title": "Longest Common Subsequence",
+      "level": "pro",
+      "category": "general",
+      "company": "Wipro",
+      "content": "Solve advanced algorithmic problem: Longest Common Subsequence.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 304,
+      "title": "Knapsack 0/1",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Cognizant",
+      "content": "Solve advanced algorithmic problem: Knapsack 0/1.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 305,
+      "title": "Edit Distance",
+      "level": "pro",
+      "category": "general",
+      "company": "Google",
+      "content": "Solve advanced algorithmic problem: Edit Distance.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 306,
+      "title": "Breadth First Search",
       "level": "pro",
       "category": "mnc",
       "company": "Amazon",
-      "content": "Given an array of integers, what is the name of the dynamic programming algorithm used to find the maximum subarray sum in O(n) time?",
-      "answer": "kadane's algorithm",
-      "xp_reward": 35
+      "content": "Solve advanced algorithmic problem: Breadth First Search.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
     },
     {
-      "id": 15,
+      "id": 307,
+      "title": "Depth First Search",
+      "level": "pro",
+      "category": "general",
+      "company": "Microsoft",
+      "content": "Solve advanced algorithmic problem: Depth First Search.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 308,
+      "title": "Dijkstra Shortest Path",
+      "level": "pro",
+      "category": "mnc",
+      "company": "TCS",
+      "content": "Solve advanced algorithmic problem: Dijkstra Shortest Path.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 309,
+      "title": "Binary Tree Level Order",
+      "level": "pro",
+      "category": "general",
+      "company": "Infosys",
+      "content": "Solve advanced algorithmic problem: Binary Tree Level Order.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 310,
+      "title": "Merge K Sorted Lists",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Wipro",
+      "content": "Solve advanced algorithmic problem: Merge K Sorted Lists.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 311,
+      "title": "Regex Matching",
+      "level": "pro",
+      "category": "general",
+      "company": "Cognizant",
+      "content": "Solve advanced algorithmic problem: Regex Matching.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 312,
+      "title": "Median of Sorted",
       "level": "pro",
       "category": "mnc",
       "company": "Google",
-      "content": "Complete this JavaScript function header to return the sum of two variables a and b: 'function add(a, b) { return ... }'",
-      "answer": "a + b",
-      "xp_reward": 30
+      "content": "Solve advanced algorithmic problem: Median of Sorted.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 313,
+      "title": "Longest Palindromic Substring",
+      "level": "pro",
+      "category": "general",
+      "company": "Amazon",
+      "content": "Solve advanced algorithmic problem: Longest Palindromic Substring.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 314,
+      "title": "N-Queens",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Microsoft",
+      "content": "Solve advanced algorithmic problem: N-Queens.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 315,
+      "title": "Sudoku Solver",
+      "level": "pro",
+      "category": "general",
+      "company": "TCS",
+      "content": "Solve advanced algorithmic problem: Sudoku Solver.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 316,
+      "title": "Word Ladder",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Infosys",
+      "content": "Solve advanced algorithmic problem: Word Ladder.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 317,
+      "title": "Min Window Substring",
+      "level": "pro",
+      "category": "general",
+      "company": "Wipro",
+      "content": "Solve advanced algorithmic problem: Min Window Substring.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 318,
+      "title": "Longest Valid Parentheses",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Cognizant",
+      "content": "Solve advanced algorithmic problem: Longest Valid Parentheses.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 319,
+      "title": "Trapping Rain Water",
+      "level": "pro",
+      "category": "general",
+      "company": "Google",
+      "content": "Solve advanced algorithmic problem: Trapping Rain Water.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 320,
+      "title": "Wildcard Matching",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Amazon",
+      "content": "Solve advanced algorithmic problem: Wildcard Matching.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 321,
+      "title": "Topological Sort",
+      "level": "pro",
+      "category": "general",
+      "company": "Microsoft",
+      "content": "Solve advanced algorithmic problem: Topological Sort.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 322,
+      "title": "Clone Graph",
+      "level": "pro",
+      "category": "mnc",
+      "company": "TCS",
+      "content": "Solve advanced algorithmic problem: Clone Graph.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 323,
+      "title": "Kth Largest",
+      "level": "pro",
+      "category": "general",
+      "company": "Infosys",
+      "content": "Solve advanced algorithmic problem: Kth Largest.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 324,
+      "title": "LRU Cache Design",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Wipro",
+      "content": "Solve advanced algorithmic problem: LRU Cache Design.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 325,
+      "title": "Anagram Groups",
+      "level": "pro",
+      "category": "general",
+      "company": "Cognizant",
+      "content": "Solve advanced algorithmic problem: Anagram Groups.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 326,
+      "title": "K Closest Points",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Google",
+      "content": "Solve advanced algorithmic problem: K Closest Points.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 327,
+      "title": "Subtree Check",
+      "level": "pro",
+      "category": "general",
+      "company": "Amazon",
+      "content": "Solve advanced algorithmic problem: Subtree Check.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 328,
+      "title": "Tree Diameter",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Microsoft",
+      "content": "Solve advanced algorithmic problem: Tree Diameter.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 329,
+      "title": "Tree Serializer",
+      "level": "pro",
+      "category": "general",
+      "company": "TCS",
+      "content": "Solve advanced algorithmic problem: Tree Serializer.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
+    },
+    {
+      "id": 330,
+      "title": "Max Path Sum",
+      "level": "pro",
+      "category": "mnc",
+      "company": "Infosys",
+      "content": "Solve advanced algorithmic problem: Max Path Sum.\n\nInput Format: Standard input testcase values.\nOutput Format: Print the solved output parameters.",
+      "xp_reward": 40,
+      "templates": {
+        "python": "import sys\nif __name__ == '__main__':\n    # Write Python code\n    pass",
+        "javascript": "const fs = require('fs');\n// Write JS code",
+        "cpp": "#include <iostream>\nusing namespace std;\nint main() {\n    return 0;\n}",
+        "java": "import java.util.Scanner;\npublic class Main {\n    public static void main(String[] args) {\n    }\n}"
+      },
+      "testCases": [
+        {
+          "input": "abc\nabc",
+          "output": "3"
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0"
+        }
+      ]
     }
   ]
 }

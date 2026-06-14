@@ -7,10 +7,12 @@ import questionsData from '../data/questions.json';
 
 type Question = {
   id: number;
+  title: string;
   level: string;
   category: string;
   content: string;
-  answer: string;
+  templates: Record<string, string>;
+  testCases: Array<{ input: string; output: string }>;
   xp_reward: number;
 };
 
@@ -42,11 +44,12 @@ const QuestionBank: React.FC<Props> = ({ category = 'general', level: propLevel,
 
       if (!activeLevel) {
         try {
-          const { data: profile } = await supabase
-            .from('users')
+          const { data: profile, error } = await supabase
+            .from('student_profiles')
             .select('level')
             .eq('id', user.id)
             .single();
+          if (error) throw error;
           activeLevel = profile?.level || 'beginner';
         } catch (err) {
           // Fallback to local storage
@@ -58,7 +61,7 @@ const QuestionBank: React.FC<Props> = ({ category = 'general', level: propLevel,
       setCurrentLevel(finalLevel);
 
       // Filter questions matching level and category
-      const filtered = (questionsData as any).questions.filter((q: Question) => {
+      const filtered = (questionsData as any).coding.filter((q: Question) => {
         const levelMatch = q.level === finalLevel;
         const catMatch = q.category === category;
         return levelMatch && catMatch;
@@ -89,7 +92,7 @@ const QuestionBank: React.FC<Props> = ({ category = 'general', level: propLevel,
         <QuestionItem
           key={q.id}
           question={q}
-          onAnswered={() => onAnswered(q.xp_reward)}
+          onAnswered={(xpChange) => onAnswered(xpChange)}
         />
       ))}
     </div>
