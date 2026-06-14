@@ -822,9 +822,13 @@ img { display:block; }
   grid-template-columns: 1fr 1fr;
   position: relative;
 }
+@media (max-width: 1024px) {
+  .login-page { grid-template-columns: 1fr; }
+  .login-form-panel { order: 1; }
+  .login-art-panel { order: 2; }
+}
 @media (max-width: 768px) {
-  .login-page { grid-template-columns:1fr; }
-  .login-art-panel { display:none; }
+  .login-art-panel { display: none; }
 }
 
 /* Left — Art panel */
