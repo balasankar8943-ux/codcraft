@@ -1075,6 +1075,20 @@ img { display:block; }
 }
 .cert-tier-tab.active { background:var(--indigo); color:#fff; box-shadow:var(--shadow-xs); }
 
+/* ── Certificate Layout ───────────────────────────────────── */
+.cert-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+}
+@media (max-width: 1024px) {
+  .cert-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Select ─────────────────────────────────────────────── */
 .select {
   background:var(--bg2); border:1.5px solid var(--border);
