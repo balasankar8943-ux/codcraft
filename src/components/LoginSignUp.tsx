@@ -47,7 +47,7 @@ const LoginSignUp: React.FC = () => {
       {/* ─── Left Art Panel ─────────────────────────────────── */}
       <div className="login-art-panel">
         <img
-          src="/login-art.png"
+          src={`${import.meta.env.BASE_URL}login-art.png`}
           alt="Student coding illustration"
           className="login-art-img"
         />
@@ -83,7 +83,7 @@ const LoginSignUp: React.FC = () => {
 
           {/* Brand */}
           <div className="login-brand">
-            <img src="/yantrixa-logo.png" alt="Yantrixa" />
+            <img src={`${import.meta.env.BASE_URL}yantrixa-logo.png`} alt="Yantrixa" />
             <span className="login-brand-name">CodCraft</span>
             <span className="login-brand-tag">KTU</span>
           </div>

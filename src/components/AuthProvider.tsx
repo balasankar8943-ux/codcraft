@@ -7,6 +7,7 @@ import type { Session, User } from '@supabase/supabase-js';
 type AuthContextType = {
   session: Session | null;
   user: User | null;
+  loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -26,14 +27,19 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let resolved = false;
+
     // Check local storage for sandbox user session
     const localUser = localStorage.getItem('codcraft_logged_in_user');
     if (localUser) {
       const mockUser = { id: 'sandbox_user_id', email: localUser } as User;
       setUser(mockUser);
       setSession({ user: mockUser } as Session);
+      setLoading(false);
+      resolved = true;
     }
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -47,6 +53,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(null);
         }
       }
+      setLoading(false);
+      resolved = true;
     });
 
     const currentSession = supabase.auth.getSession();
@@ -55,7 +63,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session.user);
       }
-    }).catch(() => {});
+      if (!resolved) {
+        setLoading(false);
+      }
+    }).catch(() => {
+      if (!resolved) {
+        setLoading(false);
+      }
+    });
 
     return () => {
       authListener?.subscription.unsubscribe();
@@ -112,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, signIn, signUp, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ session, user, loading, signIn, signUp, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );

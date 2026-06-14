@@ -384,7 +384,7 @@ const HomePage: React.FC = () => {
       {/* ── Sticky Header ───────────────────────────────────── */}
       <header className="app-header">
         <div className="app-header-logo" onClick={() => navigate('practice')}>
-          <img src="/yantrixa-logo.png" alt="Yantrixa" />
+          <img src={`${import.meta.env.BASE_URL}yantrixa-logo.png`} alt="Yantrixa" />
           <span className="name">CodCraft</span>
           <span className="ktu-tag">KTU</span>
         </div>
@@ -611,7 +611,7 @@ const HomePage: React.FC = () => {
 
       {/* ── Footer ───────────────────────────────────────────── */}
       <footer className="app-footer">
-        <img src="/yantrixa-logo.png" alt="Yantrixa" />
+        <img src={`${import.meta.env.BASE_URL}yantrixa-logo.png`} alt="Yantrixa" />
         CodCraft © 2026 · KTU Curriculum Aligned ·
         Built by <a href="https://yantrixa.in" target="_blank" rel="noopener noreferrer">yantrixa.in</a>
       </footer>
@@ -622,7 +622,7 @@ const HomePage: React.FC = () => {
           <div className="drawer" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <div className="drawer-logo">
-                <img src="/yantrixa-logo.png" alt="Yantrixa" />
+                <img src={`${import.meta.env.BASE_URL}yantrixa-logo.png`} alt="Yantrixa" />
                 <span>CodCraft</span>
               </div>
               <button className="drawer-close" onClick={() => setIsMenuOpen(false)}><Icon.X /></button>
