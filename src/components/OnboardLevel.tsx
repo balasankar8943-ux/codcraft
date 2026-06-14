@@ -11,7 +11,7 @@ type Props = {
 
 const OnboardLevel: React.FC<Props> = ({ onClose, onSaved }) => {
   const { user } = useAuth();
-  const [step, setStep] = useState<'quiz' | 'result'>('quiz');
+  const [step, setStep] = useState<'quiz' | 'result' | 'choose'>('quiz');
   const [assignedLevel, setAssignedLevel] = useState<string>('beginner');
   const [score, setScore] = useState<number>(0);
   const [loading, setLoading] = useState(false);
@@ -78,7 +78,78 @@ const OnboardLevel: React.FC<Props> = ({ onClose, onSaved }) => {
         <div style={{ position: 'absolute', bottom: 0, left: 0, width: '120px', height: '120px', background: 'rgba(245,158,11,0.03)', borderRadius: '50%', filter: 'blur(30px)', pointerEvents: 'none' }} />
 
         {step === 'quiz' ? (
-          <DiagnosticQuiz onCompleted={handleQuizCompleted} />
+          <DiagnosticQuiz onCompleted={handleQuizCompleted} onSkip={() => setStep('choose')} />
+        ) : step === 'choose' ? (
+          <div className="text-center" style={{ padding: '1rem 0' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🎯</div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text)', marginBottom: '0.5rem' }}>
+              Select Your Coding Track
+            </h2>
+            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem', maxWidth: '380px', marginInline: 'auto', lineHeight: 1.4 }}>
+              Skip the assessment and select your preferred coding track. You will level up dynamically as you solve more questions!
+            </p>
+
+            <div className="flex flex-col gap-3" style={{ maxWidth: '400px', margin: '0 auto 1.75rem', textAlign: 'left' }}>
+              {(['beginner', 'mid', 'pro'] as const).map(lvl => {
+                const isSelected = assignedLevel === lvl;
+                const title = lvl === 'pro' ? 'Advanced (Pro)' : lvl === 'mid' ? 'Intermediate (Mid)' : 'Beginner';
+                const desc = lvl === 'pro' 
+                  ? 'Advanced algorithms, graphs, and dynamic programming.' 
+                  : lvl === 'mid' 
+                  ? 'Data structures, recursion, complexity, and sorting algorithms.' 
+                  : 'Core programming syntax, conditionals, and logical loops.';
+                const borderClr = isSelected ? 'var(--indigo)' : 'var(--border)';
+                const bgClr = isSelected ? 'var(--indigo-bg)' : 'var(--bg2)';
+                
+                return (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => setAssignedLevel(lvl)}
+                    style={{
+                      display: 'flex', flexDirection: 'column', gap: '0.3rem', padding: '0.85rem 1.1rem',
+                      borderRadius: 'var(--radius)', border: '2px solid', borderColor: borderClr,
+                      backgroundColor: bgClr, cursor: 'pointer', textAlign: 'left', width: '100%',
+                      transition: 'all 0.15s ease', outline: 'none'
+                    }}
+                  >
+                    <span style={{ fontSize: '0.88rem', fontWeight: 800, color: isSelected ? 'var(--indigo)' : 'var(--text)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                      {title} {isSelected && <span style={{ fontSize: '0.8rem', color: 'var(--indigo)' }}>✓</span>}
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--muted)', lineHeight: 1.4 }}>
+                      {desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {error && (
+              <div className="alert alert-error" style={{ maxWidth: '400px', marginInline: 'auto', textAlign: 'left', marginBottom: '1.25rem' }}>
+                <span>⚠️</span>
+                <p style={{ margin: 0 }}>{error}</p>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '400px', marginInline: 'auto' }}>
+              <button
+                className="btn btn-outline"
+                style={{ flex: 1 }}
+                onClick={() => setStep('quiz')}
+                disabled={loading}
+              >
+                Back to Quiz
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ flex: 2 }}
+                onClick={saveLevel}
+                disabled={loading}
+              >
+                {loading ? 'Saving Track...' : 'Confirm Track'}
+              </button>
+            </div>
+          </div>
         ) : (
           <div className="text-center" style={{ padding: '1rem 0' }}>
             <div className="animate-bounce" style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>

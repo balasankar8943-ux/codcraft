@@ -4,6 +4,7 @@ import questionsData from '../data/questions.json';
 
 interface Props {
   onCompleted: (assignedLevel: string, score: number) => void;
+  onSkip: () => void;
 }
 
 interface DiagnosticQuestion {
@@ -15,7 +16,7 @@ interface DiagnosticQuestion {
   answer: string;
 }
 
-const DiagnosticQuiz: React.FC<Props> = ({ onCompleted }) => {
+const DiagnosticQuiz: React.FC<Props> = ({ onCompleted, onSkip }) => {
   const questions: DiagnosticQuestion[] = questionsData.diagnostic;
   const [currentIdx, setCurrentIdx] = useState<number>(-1); // -1 is intro screen
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
@@ -84,9 +85,14 @@ const DiagnosticQuiz: React.FC<Props> = ({ onCompleted }) => {
           </ul>
         </div>
         
-        <button className="btn btn-primary" style={{ width: '100%', maxWidth: '280px', marginTop: '1rem' }} onClick={handleStart}>
-          Start Assessment
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.65rem', marginTop: '1.5rem', width: '100%' }}>
+          <button className="btn btn-primary" style={{ width: '100%', maxWidth: '280px' }} onClick={handleStart}>
+            Start Assessment
+          </button>
+          <button className="btn btn-ghost" style={{ width: '100%', maxWidth: '280px', fontSize: '0.78rem', color: 'var(--muted)' }} onClick={onSkip}>
+            Skip & Choose Track Manually
+          </button>
+        </div>
       </div>
     );
   }
@@ -145,6 +151,14 @@ const DiagnosticQuiz: React.FC<Props> = ({ onCompleted }) => {
           disabled={currentIdx === 0}
         >
           Previous
+        </button>
+
+        <button
+          className="btn btn-ghost"
+          style={{ fontSize: '0.78rem', color: 'var(--muted)', padding: '0.35rem 0.75rem' }}
+          onClick={onSkip}
+        >
+          Skip Quiz
         </button>
 
         {currentIdx === questions.length - 1 ? (
