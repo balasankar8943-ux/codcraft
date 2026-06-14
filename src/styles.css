@@ -1088,6 +1088,10 @@ img { display:block; }
     grid-template-columns: 1fr;
   }
 }
+.cert-swipe-hint { display: none; }
+@media (max-width: 768px) {
+  .cert-swipe-hint { display: block; }
+}
 
 /* ── Select ─────────────────────────────────────────────── */
 .select {

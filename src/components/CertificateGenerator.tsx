@@ -409,117 +409,122 @@ const CertificateGenerator: React.FC<Props> = ({ xp }) => {
           </div>
 
           {/* Render Certificate frame preview */}
-          <div style={{ position: 'relative', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-lg)', aspectRatio: '1.414 / 1', backgroundColor: '#0d0c0b', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.5rem', userSelect: 'none' }}>
-            {/* Watermark gradient */}
-            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle, rgba(245,158,11,0.05) 0%, rgba(0,0,0,0) 70%)', pointerEvents: 'none' }} />
+          <div style={{ width: '100%', overflowX: 'auto', paddingBottom: '0.5rem', borderRadius: 'var(--radius-lg)' }} className="cert-preview-scroll-container">
+            <div style={{ position: 'relative', minWidth: '680px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-lg)', aspectRatio: '1.414 / 1', backgroundColor: '#0d0c0b', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.5rem', userSelect: 'none' }}>
+              {/* Watermark gradient */}
+              <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle, rgba(245,158,11,0.05) 0%, rgba(0,0,0,0) 70%)', pointerEvents: 'none' }} />
 
-            {/* Watermark image */}
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.03, pointerEvents: 'none' }}>
-              <img 
-                src={`${import.meta.env.BASE_URL}yantrixa-logo.png`} 
-                alt="Watermark Logo" 
-                style={{ width: '45%', objectFit: 'contain' }} 
-              />
-            </div>
-
-            {/* Lock overlay if previewing locked tier */}
-            {isSelectedLevelLocked && (
-              <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', zIndex: 30, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', textAlign: 'center' }}>
-                <div style={{ width: '56px', height: '56px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--danger)', marginBottom: '1rem', boxShadow: 'var(--shadow)' }}>
-                  <Lock size={24} />
-                </div>
-                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>Certificate Level Locked</h4>
-                <p style={{ fontSize: '0.75rem', color: 'var(--muted2)', maxWidth: '320px', lineHeight: 1.5, marginBottom: '1rem' }}>
-                  You need at least <strong style={{ color: 'var(--warning)' }}>{currentLevelConfig.threshold} XP</strong> to unlock the {selectedLevel} certification. You currently have <strong>{xp} XP</strong>.
-                </p>
-                <span style={{ fontSize: '0.62rem', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--warning)' }}>
-                  Earn {currentLevelConfig.threshold - xp} more XP to qualify!
-                </span>
-              </div>
-            )}
-
-            {/* Outer border */}
-            <div style={{ position: 'absolute', inset: '8px', border: '1px solid rgba(255,255,255,0.05)', pointerEvents: 'none', borderRadius: 'calc(var(--radius-lg) - 4px)' }}></div>
-            
-            {/* Inner Gold/Silver/Bronze border */}
-            <div 
-              style={{ position: 'absolute', inset: '16px', border: '3px double', borderColor: currentLevelConfig.borderColor, pointerEvents: 'none', transition: 'border-color 0.3s', borderRadius: 'calc(var(--radius-lg) - 8px)' }}
-            ></div>
-
-            {/* Certificate content layout */}
-            <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around', padding: '0.5rem 0', zIndex: 10 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <p 
-                  style={{ fontSize: '0.62rem', letterSpacing: '0.25em', fontWeight: 800, textTransform: 'uppercase', color: currentLevelConfig.borderColor, transition: 'all 0.3s' }}
-                >
-                  C O D C R A F T   B Y   Y A N T R I X A
-                </p>
-                <div style={{ height: '1px', width: '80px', background: 'var(--border)', margin: '0 auto', opacity: 0.3 }}></div>
+              {/* Watermark image */}
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.03, pointerEvents: 'none' }}>
+                <img 
+                  src={`${import.meta.env.BASE_URL}yantrixa-logo.png`} 
+                  alt="Watermark Logo" 
+                  style={{ width: '45%', objectFit: 'contain' }} 
+                />
               </div>
 
-              <div>
-                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff', textTransform: 'uppercase' }}>
-                  Certificate of Achievement
-                </h3>
-                <p style={{ fontSize: '0.7rem', color: 'var(--muted2)', fontStyle: 'italic', marginTop: '0.25rem' }}>
-                  This is proudly presented to
-                </p>
-              </div>
-
-              <div style={{ padding: '0.4rem 0' }}>
-                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fbbf24', background: 'linear-gradient(to right, #fef3c7, #fbbf24, #f59e0b)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  {name.toUpperCase() || 'KERALA ENGINEERING STUDENT'}
-                </h2>
-                <div style={{ height: '1px', width: '160px', background: 'linear-gradient(to right, transparent, rgba(251, 191, 36, 0.4), transparent)', margin: '0 auto', marginTop: '0.5rem' }}></div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: '480px', margin: '0 auto', padding: '0 1rem' }}>
-                <p style={{ fontSize: '0.62rem', color: 'var(--muted2)' }}>for successfully qualifying as a</p>
-                <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                  {currentLevelConfig.title}
-                </h4>
-                <p style={{ fontSize: '0.65rem', color: 'var(--muted2)', lineHeight: 1.4, maxWidth: '420px', margin: '0 auto' }}>
-                  {currentLevelConfig.description}
-                </p>
-              </div>
-
-              {/* Bottom Row */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 1.5rem', marginTop: '0.4rem' }}>
-                <div style={{ textAlign: 'center', width: '33.33%' }}>
-                  <span style={{ fontStyle: 'italic', fontSize: '0.75rem', color: 'rgba(254, 243, 199, 0.7)', userSelect: 'none', display: 'block' }}>
-                    CodCraft Board
+              {/* Lock overlay if previewing locked tier */}
+              {isSelectedLevelLocked && (
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', zIndex: 30, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', textAlign: 'center' }}>
+                  <div style={{ width: '56px', height: '56px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--danger)', marginBottom: '1rem', boxShadow: 'var(--shadow)' }}>
+                    <Lock size={24} />
+                  </div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>Certificate Level Locked</h4>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--muted2)', maxWidth: '320px', lineHeight: 1.5, marginBottom: '1rem' }}>
+                    You need at least <strong style={{ color: 'var(--warning)' }}>{currentLevelConfig.threshold} XP</strong> to unlock the {selectedLevel} certification. You currently have <strong>{xp} XP</strong>.
+                  </p>
+                  <span style={{ fontSize: '0.62rem', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--warning)' }}>
+                    Earn {currentLevelConfig.threshold - xp} more XP to qualify!
                   </span>
-                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '70px', margin: '0.25rem auto' }}></div>
-                  <p style={{ fontSize: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted2)' }}>ISSUING AUTHORITY</p>
+                </div>
+              )}
+
+              {/* Outer border */}
+              <div style={{ position: 'absolute', inset: '8px', border: '1px solid rgba(255,255,255,0.05)', pointerEvents: 'none', borderRadius: 'calc(var(--radius-lg) - 4px)' }}></div>
+              
+              {/* Inner Gold/Silver/Bronze border */}
+              <div 
+                style={{ position: 'absolute', inset: '16px', border: '3px double', borderColor: currentLevelConfig.borderColor, pointerEvents: 'none', transition: 'border-color 0.3s', borderRadius: 'calc(var(--radius-lg) - 8px)' }}
+              ></div>
+
+              {/* Certificate content layout */}
+              <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around', padding: '0.5rem 0', zIndex: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <p 
+                    style={{ fontSize: '0.62rem', letterSpacing: '0.25em', fontWeight: 800, textTransform: 'uppercase', color: currentLevelConfig.borderColor, transition: 'all 0.3s' }}
+                  >
+                    C O D C R A F T   B Y   Y A N T R I X A
+                  </p>
+                  <div style={{ height: '1px', width: '80px', background: 'var(--border)', margin: '0 auto', opacity: 0.3 }}></div>
                 </div>
 
-                <div 
-                  style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative',
-                    width: '56px', height: '56px', borderRadius: '50%', border: '1px solid', borderColor: currentLevelConfig.borderColor,
-                    backgroundColor: '#161513', boxShadow: 'var(--shadow)', transition: 'all 0.3s'
-                  }}
-                >
-                  <div style={{ position: 'absolute', inset: '3px', borderRadius: '50%', border: '1px dashed rgba(212, 175, 55, 0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: '0.35rem', fontWeight: 900, color: '#fbbf24' }}>OFFICIAL</span>
-                    <span style={{ fontSize: '0.3rem', fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em' }}>SEAL</span>
+                <div>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff', textTransform: 'uppercase' }}>
+                    Certificate of Achievement
+                  </h3>
+                  <p style={{ fontSize: '0.7rem', color: 'var(--muted2)', fontStyle: 'italic', marginTop: '0.25rem' }}>
+                    This is proudly presented to
+                  </p>
+                </div>
+
+                <div style={{ padding: '0.4rem 0' }}>
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fbbf24', background: 'linear-gradient(to right, #fef3c7, #fbbf24, #f59e0b)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    {name.toUpperCase() || 'KERALA ENGINEERING STUDENT'}
+                  </h2>
+                  <div style={{ height: '1px', width: '160px', background: 'linear-gradient(to right, transparent, rgba(251, 191, 36, 0.4), transparent)', margin: '0 auto', marginTop: '0.5rem' }}></div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: '480px', margin: '0 auto', padding: '0 1rem' }}>
+                  <p style={{ fontSize: '0.62rem', color: 'var(--muted2)' }}>for successfully qualifying as a</p>
+                  <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                    {currentLevelConfig.title}
+                  </h4>
+                  <p style={{ fontSize: '0.65rem', color: 'var(--muted2)', lineHeight: 1.4, maxWidth: '420px', margin: '0 auto' }}>
+                    {currentLevelConfig.description}
+                  </p>
+                </div>
+
+                {/* Bottom Row */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 1.5rem', marginTop: '0.4rem' }}>
+                  <div style={{ textAlign: 'center', width: '33.33%' }}>
+                    <span style={{ fontStyle: 'italic', fontSize: '0.75rem', color: 'rgba(254, 243, 199, 0.7)', userSelect: 'none', display: 'block' }}>
+                      CodCraft Board
+                    </span>
+                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '70px', margin: '0.25rem auto' }}></div>
+                    <p style={{ fontSize: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted2)' }}>ISSUING AUTHORITY</p>
+                  </div>
+
+                  <div 
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative',
+                      width: '56px', height: '56px', borderRadius: '50%', border: '1px solid', borderColor: currentLevelConfig.borderColor,
+                      backgroundColor: '#161513', boxShadow: 'var(--shadow)', transition: 'all 0.3s'
+                    }}
+                  >
+                    <div style={{ position: 'absolute', inset: '3px', borderRadius: '50%', border: '1px dashed rgba(212, 175, 55, 0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '0.35rem', fontWeight: 900, color: '#fbbf24' }}>OFFICIAL</span>
+                      <span style={{ fontSize: '0.3rem', fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em' }}>SEAL</span>
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'center', width: '33.33%' }}>
+                    <span style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', color: 'rgba(191, 219, 254, 0.7)', userSelect: 'none', display: 'block' }}>
+                      yantrixa.in
+                    </span>
+                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '70px', margin: '0.25rem auto' }}></div>
+                    <p style={{ fontSize: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted2)' }}>PLATFORM SPONSOR</p>
                   </div>
                 </div>
 
-                <div style={{ textAlign: 'center', width: '33.33%' }}>
-                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', color: 'rgba(191, 219, 254, 0.7)', userSelect: 'none', display: 'block' }}>
-                    yantrixa.in
-                  </span>
-                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '70px', margin: '0.25rem auto' }}></div>
-                  <p style={{ fontSize: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted2)' }}>PLATFORM SPONSOR</p>
+                <div style={{ fontSize: '0.55rem', color: 'var(--muted2)', marginTop: '0.4rem' }}>
+                  Date of Issuance: <span style={{ color: '#ffffff', fontFamily: 'var(--mono)' }}>{dateString}</span>
                 </div>
-              </div>
-
-              <div style={{ fontSize: '0.55rem', color: 'var(--muted2)', marginTop: '0.4rem' }}>
-                Date of Issuance: <span style={{ color: '#ffffff', fontFamily: 'var(--mono)' }}>{dateString}</span>
               </div>
             </div>
           </div>
+          <span style={{ fontSize: '0.68rem', color: 'var(--muted)', textAlign: 'center', marginTop: '-0.2rem', marginBottom: '0.4rem' }} className="cert-swipe-hint">
+            ↔ Swipe preview card to see complete details
+          </span>
         </div>
 
         {/* Certificate Sidebar Settings (Right Pane) */}
