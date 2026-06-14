@@ -10,6 +10,7 @@ type AuthContextType = {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
+  signInSandbox: (email?: string) => void;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -32,23 +33,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let resolved = false;
 
-    // Check local storage for sandbox user session
-    const localUser = localStorage.getItem('codcraft_logged_in_user');
-    if (localUser) {
-      const mockUser = { id: 'sandbox_user_id', email: localUser } as User;
-      setUser(mockUser);
-      setSession({ user: mockUser } as Session);
-      setLoading(false);
-      resolved = true;
-    }
-
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
+        localStorage.removeItem('codcraft_logged_in_user');
         setSession(session);
         setUser(session.user);
       } else {
         // Only clear state if sandbox user is also not logged in
-        if (!localStorage.getItem('codcraft_logged_in_user')) {
+        const localUser = localStorage.getItem('codcraft_logged_in_user');
+        if (localUser) {
+          const mockUser = { id: 'sandbox_user_id', email: localUser } as User;
+          setUser(mockUser);
+          setSession({ user: mockUser } as Session);
+        } else {
           setSession(null);
           setUser(null);
         }
@@ -57,20 +54,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       resolved = true;
     });
 
-    const currentSession = supabase.auth.getSession();
-    currentSession.then(({ data: { session } }) => {
-      if (session) {
-        setSession(session);
-        setUser(session.user);
-      }
-      if (!resolved) {
-        setLoading(false);
-      }
-    }).catch(() => {
-      if (!resolved) {
-        setLoading(false);
-      }
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (session) {
+          localStorage.removeItem('codcraft_logged_in_user');
+          setSession(session);
+          setUser(session.user);
+        } else {
+          const localUser = localStorage.getItem('codcraft_logged_in_user');
+          if (localUser) {
+            const mockUser = { id: 'sandbox_user_id', email: localUser } as User;
+            setUser(mockUser);
+            setSession({ user: mockUser } as Session);
+          } else {
+            setSession(null);
+            setUser(null);
+          }
+        }
+        if (!resolved) {
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        const localUser = localStorage.getItem('codcraft_logged_in_user');
+        if (localUser) {
+          const mockUser = { id: 'sandbox_user_id', email: localUser } as User;
+          setUser(mockUser);
+          setSession({ user: mockUser } as Session);
+        } else {
+          setSession(null);
+          setUser(null);
+        }
+        if (!resolved) {
+          setLoading(false);
+        }
+      });
 
     return () => {
       authListener?.subscription.unsubscribe();
@@ -78,42 +96,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-    } catch (err: any) {
-      console.warn("Supabase Auth failed, falling back to Local Sandbox Auth:", err.message);
-      localStorage.setItem('codcraft_logged_in_user', email);
-      const mockUser = { id: 'sandbox_user_id', email } as User;
-      setUser(mockUser);
-      setSession({ user: mockUser } as Session);
-    }
+    localStorage.removeItem('codcraft_logged_in_user');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
   };
 
   const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
-    } catch (err: any) {
-      console.warn("Supabase Auth failed, falling back to Local Sandbox Auth:", err.message);
-      localStorage.setItem('codcraft_logged_in_user', email);
-      const mockUser = { id: 'sandbox_user_id', email } as User;
-      setUser(mockUser);
-      setSession({ user: mockUser } as Session);
-    }
+    localStorage.removeItem('codcraft_logged_in_user');
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+  };
+
+  const signInSandbox = (email: string = 'guest@codcraft.in') => {
+    localStorage.setItem('codcraft_logged_in_user', email);
+    const mockUser = { id: 'sandbox_user_id', email } as User;
+    setUser(mockUser);
+    setSession({ user: mockUser } as Session);
   };
 
   const signInWithGoogle = async () => {
+    localStorage.removeItem('codcraft_logged_in_user');
     try {
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
       if (error) throw error;
     } catch (err: any) {
       console.warn("Supabase Google Auth failed, falling back to Local Sandbox Auth:", err.message);
-      const email = 'google.coder@ktu.edu.in';
-      localStorage.setItem('codcraft_logged_in_user', email);
-      const mockUser = { id: 'sandbox_user_id', email } as User;
-      setUser(mockUser);
-      setSession({ user: mockUser } as Session);
+      signInSandbox('google.coder@ktu.edu.in');
     }
   };
 
@@ -127,7 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, signIn, signUp, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ session, user, loading, signIn, signUp, signInSandbox, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );

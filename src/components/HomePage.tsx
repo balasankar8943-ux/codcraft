@@ -204,7 +204,7 @@ const HomePage: React.FC = () => {
     } catch (err: any) {
       console.warn("Supabase profile sync failed, running in local fallback mode:", err.message);
       setIsSandbox(true);
-      setDbError("Supabase database connection offline. Running in local sandbox mode.");
+      setDbError("Running in offline mode. Your progress is saved locally.");
       
       const uid = user.id;
       const lxp = parseInt(localStorage.getItem(`codcraft_xp_${uid}`) || '0', 10);

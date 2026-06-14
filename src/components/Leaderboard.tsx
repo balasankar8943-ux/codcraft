@@ -23,11 +23,21 @@ const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName }) =
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'beginner' | 'mid' | 'pro'>('all');
+  const isSandbox = user?.id === 'sandbox_user_id';
 
   useEffect(() => {
     const fetchScores = async () => {
       setLoading(true);
       setError(null);
+
+      // Sandbox/local users have no real Supabase JWT — skip the RPC call
+      if (isSandbox) {
+        setScores([]);
+        setError(null);
+        setLoading(false);
+        return;
+      }
+
       try {
         const { data, error: dbError } = await supabase
           .rpc('get_codcraft_leaderboard', { result_limit: 100 });
@@ -58,14 +68,14 @@ const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName }) =
         setLoading(false);
       } catch (err: any) {
         console.error("Failed to fetch leaderboard from Supabase:", err);
-        setError("Unable to sync leaderboard from Supabase.");
+        setError("Leaderboard is currently unavailable. Please try again later.");
         setScores([]);
         setLoading(false);
       }
     };
 
     fetchScores();
-  }, [user, refreshTrigger, filter, currentUserFullName]);
+  }, [user, refreshTrigger, filter, currentUserFullName, isSandbox]);
 
   const formatStudentName = (name: string, college: string | null) => {
     if (college && college !== 'Kerala Engineering Student') {
@@ -94,7 +104,12 @@ const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName }) =
         <button style={filterBtnStyle(filter==='pro','#d97706')} onClick={() => setFilter('pro')}>Pro</button>
       </div>
 
-      {loading ? (
+      {isSandbox ? (
+        <div style={{ textAlign:'center', padding:'2rem 1rem' }}>
+          <p style={{ fontSize:'0.85rem', color:'var(--muted)', marginBottom:'0.5rem' }}>🔒 Leaderboard requires Supabase authentication</p>
+          <p style={{ fontSize:'0.72rem', color:'var(--muted2)', lineHeight:1.5 }}>Sign up with a real email and password to appear on the global leaderboard and compete with other students.</p>
+        </div>
+      ) : loading ? (
         <p style={{ textAlign:'center', fontSize:'0.8rem', color:'var(--muted)', padding:'1.5rem 0' }}>Loading ranks…</p>
       ) : error ? (
         <p style={{ textAlign:'center', fontSize:'0.8rem', color:'var(--danger)', padding:'1.5rem 0' }}>{error}</p>
