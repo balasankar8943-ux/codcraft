@@ -11,9 +11,15 @@ const CertificatesPage: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('student_progress').select('score').eq('email', user.email).single()
-      .then(({ data }) => { if (data) setXp(data.score ?? 0); })
-      .catch(() => { setXp(parseInt(localStorage.getItem(`codcraft_xp_${user.id}`) || '0')); });
+    const fetchXp = async () => {
+      const { data } = await supabase.from('student_progress').select('score').eq('email', user.email).single();
+      if (data) {
+        setXp(data.score ?? 0);
+      } else {
+        setXp(parseInt(localStorage.getItem(`codcraft_xp_${user.id}`) || '0'));
+      }
+    };
+    fetchXp();
   }, [user]);
 
   return (

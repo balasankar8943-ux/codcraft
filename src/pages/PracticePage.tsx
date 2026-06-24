@@ -15,7 +15,6 @@ const PracticePage: React.FC = () => {
   const [xp,    setXp]    = useState(0);
   const [level, setLevel] = useState('beginner');
   const [fullName, setFullName] = useState('');
-  const [badges, setBadges] = useState<string[]>([]);
   const [recentSubs, setRecentSubs] = useState<boolean[]>([]);
   const [accuracy, setAccuracy] = useState(100);
   const [showOnboard, setShowOnboard] = useState(false);
@@ -37,7 +36,6 @@ const PracticePage: React.FC = () => {
       const score = progress?.score ?? 0;
       setLevel(lvl); setXp(score);
       setFullName(profile?.full_name || user.email?.split('@')[0] || '');
-      setBadges(JSON.parse(localStorage.getItem(`codcraft_badges_${user.id}`) || '[]'));
 
       const solved = progress?.solved_questions || [];
       const isOnboarded = profile?.diagnostic_completed || lvl !== 'beginner' || score > 0 || solved.length > 0;
@@ -63,7 +61,7 @@ const PracticePage: React.FC = () => {
     }
   };
 
-  const handleAnswerRewarded = async (reward: number) => {
+  const handleAnswerRewarded = async (_reward: number) => {
     await fetchProfile();
   };
 
@@ -76,7 +74,7 @@ const PracticePage: React.FC = () => {
       {showOnboard && (
         <OnboardLevel
           onSaved={(l: string) => { setLevel(l); setShowOnboard(false); fetchProfile(); }}
-          onSkip={(l: string) => { setLevel(l); setShowOnboard(false); }}
+          onClose={() => setShowOnboard(false)}
         />
       )}
 

@@ -41,15 +41,17 @@ const QuestionItem: React.FC<Props> = ({ question }) => {
 
     // Check solved status
     const locally = localStorage.getItem(`codcraft_solved_${user.id}_${question.id}`);
-    if (locally === 'true') { setIsSolved(true); }
-    else {
-      supabase.from('student_progress').select('solved_questions').eq('email', user.email).single()
-        .then(({ data }) => {
-          if (data?.solved_questions?.includes(question.id)) {
-            setIsSolved(true);
-            localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
-          }
-        }).catch(() => {});
+    if (locally === 'true') {
+      setIsSolved(true);
+    } else {
+      const checkSolvedStatus = async () => {
+        const { data } = await supabase.from('student_progress').select('solved_questions').eq('email', user.email).single();
+        if (data?.solved_questions?.includes(question.id)) {
+          setIsSolved(true);
+          localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
+        }
+      };
+      checkSolvedStatus();
     }
 
     // Check if user has previously written any code for this question
