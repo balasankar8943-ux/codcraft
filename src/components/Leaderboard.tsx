@@ -15,9 +15,11 @@ type UserScore = {
 interface Props {
   refreshTrigger?: number; // Hooked up to parent XP state to trigger reactive updates
   currentUserFullName?: string | null;
+  maxHeight?: string;
+  limit?: number;
 }
 
-const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName }) => {
+const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName, maxHeight = '450px', limit = 1000 }) => {
   const { user } = useAuth();
   const [scores, setScores] = useState<UserScore[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +42,7 @@ const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName }) =
 
       try {
         const { data, error: dbError } = await supabase
-          .rpc('get_codcraft_leaderboard', { result_limit: 100 });
+          .rpc('get_codcraft_leaderboard', { result_limit: limit });
           
         if (dbError) throw dbError;
         
@@ -63,8 +65,7 @@ const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName }) =
           processedData = processedData.filter(s => s.level === filter);
         }
 
-        // Limit to top 15 in the UI
-        setScores(processedData.slice(0, 15));
+        setScores(processedData);
         setLoading(false);
       } catch (err: any) {
         console.error("Failed to fetch leaderboard from Supabase:", err);
@@ -116,7 +117,7 @@ const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName }) =
       ) : scores.length === 0 ? (
         <p style={{ textAlign:'center', fontSize:'0.8rem', color:'var(--muted)', padding:'1.5rem 0' }}>No users in this tier yet.</p>
       ) : (
-        <div style={{ display:'flex', flexDirection:'column', gap:'0.3rem' }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:'0.3rem', maxHeight, overflowY:'auto', paddingRight:'0.15rem' }}>
           {scores.map((s, idx) => {
             const rank = idx + 1;
             return (

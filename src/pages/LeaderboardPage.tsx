@@ -12,15 +12,19 @@ const LeaderboardPage: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    Promise.all([
-      supabase.from('student_progress').select('score').eq('email', user.email).single(),
-      supabase.from('student_profiles').select('full_name').eq('id', user.id).single(),
-    ]).then(([prog, prof]) => {
-      if (prog.data) setXp(prog.data.score ?? 0);
-      if (prof.data) setFullName(prof.data.full_name || '');
-    }).catch(() => {
-      setXp(parseInt(localStorage.getItem(`codcraft_xp_${user.id}`) || '0'));
-    });
+    const fetchUserData = async () => {
+      try {
+        const [progRes, profRes] = await Promise.all([
+          supabase.from('student_progress').select('score').eq('email', user.email).single(),
+          supabase.from('student_profiles').select('full_name').eq('id', user.id).single(),
+        ]);
+        if (progRes.data) setXp(progRes.data.score ?? 0);
+        if (profRes.data) setFullName(profRes.data.full_name || '');
+      } catch (err) {
+        setXp(parseInt(localStorage.getItem(`codcraft_xp_${user.id}`) || '0'));
+      }
+    };
+    fetchUserData();
   }, [user]);
 
   return (
@@ -39,7 +43,7 @@ const LeaderboardPage: React.FC = () => {
               </div>
               <span className="badge badge-green">Live Updates</span>
             </div>
-            <Leaderboard refreshTrigger={xp} currentUserFullName={fullName} />
+            <Leaderboard refreshTrigger={xp} currentUserFullName={fullName} maxHeight="650px" />
           </div>
         </div>
       </div>
