@@ -1,16 +1,13 @@
 // src/components/QuestionItem.tsx
+// Card shown in the question list. Clicking navigates to /question/:id
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuth } from './AuthProvider';
-import CodeSandbox from './CodeSandbox';
 
 type Question = {
-  id: number;
-  title: string;
-  level: string;
-  category: string;
-  company?: string;
-  content: string;
+  id: number; title: string; level: string; category: string;
+  company?: string; content: string;
   templates: Record<string, string>;
   testCases: Array<{ input: string; output: string }>;
   xp_reward: number;
@@ -18,145 +15,88 @@ type Question = {
 
 type Props = {
   question: Question;
-  onAnswered: (xpChange: number, questionId: number) => void; // callback to refresh XP/level on parent
+  onAnswered: (xpChange: number, questionId: number) => void;
 };
 
-const QuestionItem: React.FC<Props> = ({ question, onAnswered }) => {
-  const { user } = useAuth();
+const companyColor = (company?: string) => {
+  switch (company?.toLowerCase()) {
+    case 'google':    return '#4285F4';
+    case 'amazon':    return '#FF9900';
+    case 'microsoft': return '#F25022';
+    case 'tcs':       return '#3b82f6';
+    case 'infosys':   return '#007cc3';
+    case 'wipro':     return '#a855f7';
+    default:          return 'var(--indigo)';
+  }
+};
+
+const QuestionItem: React.FC<Props> = ({ question }) => {
+  const { user }   = useAuth();
+  const navigate   = useNavigate();
   const [isSolved, setIsSolved] = useState(false);
-  const [isSelected, setIsSelected] = useState(false);
+  const [hasCode,  setHasCode]  = useState(false);
 
-  // Check if this question is already solved by the user
   useEffect(() => {
-    const checkSolved = async () => {
-      if (!user) return;
-      
-      const locallySolved = localStorage.getItem(`codcraft_solved_${user.id}_${question.id}`);
-      if (locallySolved === 'true') {
-        setIsSolved(true);
-        return;
-      }
+    if (!user) return;
 
-      try {
-        const { data, error } = await supabase
-          .from('student_progress')
-          .select('solved_questions')
-          .eq('email', user.email)
-          .single();
-
-        if (!error && data && Array.isArray(data.solved_questions)) {
-          if (data.solved_questions.includes(question.id)) {
+    // Check solved status
+    const locally = localStorage.getItem(`codcraft_solved_${user.id}_${question.id}`);
+    if (locally === 'true') { setIsSolved(true); }
+    else {
+      supabase.from('student_progress').select('solved_questions').eq('email', user.email).single()
+        .then(({ data }) => {
+          if (data?.solved_questions?.includes(question.id)) {
             setIsSolved(true);
             localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
           }
-        }
-      } catch (err) {
-        console.warn("Failed to query answer status from DB:", err);
-      }
-    };
-
-    checkSolved();
-  }, [user, question]);
-
-  const handleSolved = (xpChange: number) => {
-    if (xpChange > 0) {
-      setIsSolved(true);
+        }).catch(() => {});
     }
-    onAnswered(xpChange, question.id);
-  };
 
-  const getCompanyColor = (company?: string) => {
-    switch (company?.toLowerCase()) {
-      case 'google': return '#4285F4';
-      case 'amazon': return '#FF9900';
-      case 'microsoft': return '#F25022';
-      case 'tcs': return '#3b82f6';
-      case 'infosys': return '#007cc3';
-      case 'wipro': return '#a855f7';
-      default: return 'var(--indigo)';
-    }
-  };
+    // Check if user has previously written any code for this question
+    const langs = ['python', 'cpp', 'c', 'java'];
+    const anyCode = langs.some(l => localStorage.getItem(`codcraft_code_${user.id}_${question.id}_${l}`));
+    setHasCode(anyCode);
+  }, [user, question.id]);
+
+  const handleOpen = () => navigate(`/question/${question.id}`);
 
   return (
-    <div id={`challenge-${question.id}`} className="card card-p mb-4">
-      <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="text-sm font-bold uppercase tracking-wider font-mono" style={{ color: 'var(--text)' }}>
-            Challenge #{question.id}: {question.title}
+    <div id={`challenge-${question.id}`} className="question-card">
+      {/* Header row */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', minWidth: 0 }}>
+          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, fontFamily: 'var(--mono)', color: 'var(--text)', margin: 0 }}>
+            #{question.id}: {question.title}
           </h3>
           {question.company && (
-            <span className="company-badge" style={{
-              borderColor: getCompanyColor(question.company),
-              color: getCompanyColor(question.company),
-              background: 'var(--bg2)',
-              fontSize: '10px',
-              padding: '0.15rem 0.5rem'
-            }}>
+            <span className="company-badge" style={{ borderColor: companyColor(question.company), color: companyColor(question.company), background: 'var(--bg2)', fontSize: '10px', padding: '0.15rem 0.5rem' }}>
               🏢 {question.company}
             </span>
           )}
-          {question.level && (
-            <span className={`badge badge-${question.level}`} style={{ fontSize: '10px' }}>
-              {question.level}
-            </span>
-          )}
+          <span className={`badge badge-${question.level}`} style={{ fontSize: '10px' }}>{question.level}</span>
         </div>
-        <div className="flex gap-2">
-          {isSolved && (
-            <span className="badge badge-green" style={{ fontSize: '10px' }}>
-              ✓ Solved
-            </span>
-          )}
-          <span className="badge badge-gold" style={{ fontSize: '10px' }}>
-            +{question.xp_reward} XP
-          </span>
+        <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0, alignItems: 'center' }}>
+          {isSolved && <span className="badge badge-green" style={{ fontSize: '10px' }}>✓ Solved</span>}
+          {hasCode && !isSolved && <span className="badge" style={{ fontSize: '10px', background: 'var(--gold-bg)', color: 'var(--gold-text)', border: '1px solid var(--gold-border)' }}>📝 In Progress</span>}
+          <span className="badge badge-gold" style={{ fontSize: '10px' }}>+{question.xp_reward} XP</span>
         </div>
       </div>
 
-      {/* Mounting the Monaco Editor and Sandbox Runner */}
-      <div style={{ display: isSelected ? 'block' : 'none' }}>
-        <CodeSandbox question={question as any} onSolved={handleSolved} isActive={isSelected} />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.75rem' }}>
-          <button 
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => setIsSelected(false)}
-            style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem', fontWeight: 600 }}
-          >
-            🔒 Pause Workbench & Hide
-          </button>
-        </div>
-      </div>
+      {/* Preview of problem */}
+      <p style={{ fontSize: '0.78rem', color: 'var(--muted)', lineHeight: 1.5, margin: '0.6rem 0 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+        {question.content}
+      </p>
 
-      {!isSelected && (
-        <div style={{ 
-          padding: '1.25rem', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          background: 'var(--bg)', 
-          border: '1px dashed var(--border2)', 
-          borderRadius: 'var(--radius-sm)', 
-          textAlign: 'center', 
-          gap: '0.75rem',
-          marginTop: '0.5rem'
-        }}>
-          <p style={{ fontSize: '0.8rem', color: 'var(--muted)', margin: 0, maxWidth: '380px', lineHeight: 1.5 }}>
-            {isSolved 
-              ? "You have already completed this challenge! You can reopen the workbench to review or optimize your solution." 
-              : "Ready to solve this challenge? Select it to activate the workbench and start the countdown timer."}
-          </p>
-          <button
-            type="button"
-            className={`btn ${isSolved ? 'btn-outline' : 'btn-primary'} btn-sm`}
-            onClick={() => setIsSelected(true)}
-            style={{ fontWeight: 700, padding: '0.45rem 1.5rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}
-          >
-            {isSolved ? 'Review Workbench' : 'Select this question'}
-          </button>
-        </div>
-      )}
+      {/* Open button */}
+      <div style={{ marginTop: '0.85rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <button
+          onClick={handleOpen}
+          className={`btn btn-sm ${isSolved ? 'btn-outline' : 'btn-primary'}`}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, padding: '0.45rem 1.25rem' }}
+        >
+          {isSolved ? '🔍 Review Solution' : hasCode ? '▶ Continue Solving' : '▶ Solve Challenge'}
+        </button>
+      </div>
     </div>
   );
 };

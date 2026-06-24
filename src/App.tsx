@@ -1,64 +1,47 @@
+// src/App.tsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './components/AuthProvider';
 import LoginSignUp from './components/LoginSignUp';
-import HomePage from './components/HomePage';
+
+// Dedicated pages
+import PracticePage     from './pages/PracticePage';
+import MNCPage          from './pages/MNCPage';
+import LeaderboardPage  from './pages/LeaderboardPage';
+import CertificatesPage from './pages/CertificatesPage';
+import QuestionPage     from './pages/QuestionPage';
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0d0c0b', color: '#ffffff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0d0c0b', color: '#ffffff', gap: '1rem' }}>
         <div style={{ width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
-  const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    return user ? children : <Navigate to="/login" replace />;
-  };
+  const Guard: React.FC<{ children: React.ReactNode }> = ({ children }) =>
+    user ? <>{children}</> : <Navigate to="/login" replace />;
 
   return (
     <Routes>
       <Route path="/login" element={<LoginSignUp />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/leaderboard"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/mnc"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/certificates"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
+
+      {/* Practice Arena (home) */}
+      <Route path="/" element={<Guard><PracticePage /></Guard>} />
+
+      {/* Full-screen question editor */}
+      <Route path="/question/:id" element={<Guard><QuestionPage /></Guard>} />
+
+      {/* Section pages */}
+      <Route path="/mnc"          element={<Guard><MNCPage /></Guard>} />
+      <Route path="/leaderboard"  element={<Guard><LeaderboardPage /></Guard>} />
+      <Route path="/certificates" element={<Guard><CertificatesPage /></Guard>} />
+
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
