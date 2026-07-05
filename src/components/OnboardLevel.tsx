@@ -10,7 +10,7 @@ type Props = {
 };
 
 const OnboardLevel: React.FC<Props> = ({ onClose, onSaved }) => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [step, setStep] = useState<'quiz' | 'result' | 'choose'>('quiz');
   const [assignedLevel, setAssignedLevel] = useState<string>('beginner');
   const [score, setScore] = useState<number>(0);
@@ -208,6 +208,16 @@ const OnboardLevel: React.FC<Props> = ({ onClose, onSaved }) => {
             </button>
           </div>
         )}
+
+        <div style={{ marginTop: '1.25rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem', display: 'flex', justifyContent: 'center' }}>
+          <button 
+            type="button" 
+            onClick={() => { signOut(); onClose(); }} 
+            style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+          >
+            ← Sign Out / Return to Login Screen
+          </button>
+        </div>
       </div>
     </div>
   );

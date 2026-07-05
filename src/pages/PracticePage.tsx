@@ -38,7 +38,8 @@ const PracticePage: React.FC = () => {
       setFullName(profile?.full_name || user.email?.split('@')[0] || '');
 
       const solved = progress?.solved_questions || [];
-      const isOnboarded = profile?.diagnostic_completed || lvl !== 'beginner' || score > 0 || solved.length > 0;
+      const localOnboarded = localStorage.getItem(`codcraft_diagnostic_completed_${user.id}`) === 'true';
+      const isOnboarded = profile?.diagnostic_completed || localOnboarded || lvl !== 'beginner' || score > 0 || solved.length > 0;
       if (!isOnboarded) setShowOnboard(true);
 
       // Daily challenge
