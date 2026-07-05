@@ -18,9 +18,10 @@ const App: React.FC = () => {
   React.useEffect(() => {
     const appId = import.meta.env.VITE_ONESIGNAL_APP_ID;
     if (appId) {
-      const OneSignal = (window as any).OneSignal || [];
-      OneSignal.push(() => {
-        OneSignal.init({
+      const OneSignalDeferred = (window as any).OneSignalDeferred || [];
+      (window as any).OneSignalDeferred = OneSignalDeferred;
+      OneSignalDeferred.push(async (OneSignal: any) => {
+        await OneSignal.init({
           appId: appId,
           allowLocalhostAsSecureOrigin: true,
           notifyButton: {
