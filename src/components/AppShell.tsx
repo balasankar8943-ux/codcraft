@@ -27,6 +27,10 @@ const AppShell: React.FC<Props> = ({ xp = 0, children }) => {
     return location.pathname.startsWith(path);
   };
 
+  const isAdmin = user?.email?.toLowerCase().includes('admin') || 
+                  user?.email?.toLowerCase().includes('yantrixa') || 
+                  user?.email === 'balasankar8943@gmail.com';
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
 
@@ -50,6 +54,15 @@ const AppShell: React.FC<Props> = ({ xp = 0, children }) => {
               <span>{n.icon}</span> {n.label}
             </button>
           ))}
+          {isAdmin && (
+            <button
+              onClick={() => navigate('/admin-notifications')}
+              className={`desktop-nav-btn${isActive('/admin-notifications') ? ' active' : ''}`}
+              style={{ border: '1px dashed var(--indigo)', borderRadius: '6px' }}
+            >
+              <span>📢</span> Broadcast
+            </button>
+          )}
         </nav>
 
         {/* Right side */}
@@ -139,6 +152,23 @@ const AppShell: React.FC<Props> = ({ xp = 0, children }) => {
                   {n.label}
                 </button>
               ))}
+              {isAdmin && (
+                <button
+                  onClick={() => { navigate('/admin-notifications'); setMenuOpen(false); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)',
+                    border: '1px dashed var(--indigo)', background: isActive('/admin-notifications') ? 'var(--indigo-bg)' : 'transparent',
+                    color: isActive('/admin-notifications') ? 'var(--indigo)' : 'var(--text2)',
+                    fontFamily: 'var(--font)', fontSize: '0.9rem', fontWeight: isActive('/admin-notifications') ? 700 : 500,
+                    cursor: 'pointer', textAlign: 'left', transition: 'var(--transition)',
+                    borderLeft: isActive('/admin-notifications') ? '3px solid var(--indigo)' : '3px solid transparent',
+                  }}
+                >
+                  <span style={{ fontSize: '1.1rem' }}>📢</span>
+                  Broadcast Alerts
+                </button>
+              )}
             </nav>
 
             {/* Logout */}

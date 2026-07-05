@@ -10,9 +10,28 @@ import MNCPage          from './pages/MNCPage';
 import LeaderboardPage  from './pages/LeaderboardPage';
 import CertificatesPage from './pages/CertificatesPage';
 import QuestionPage     from './pages/QuestionPage';
+import AdminNotificationsPage from './pages/AdminNotificationsPage';
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
+
+  React.useEffect(() => {
+    const appId = import.meta.env.VITE_ONESIGNAL_APP_ID;
+    if (appId) {
+      const OneSignal = (window as any).OneSignal || [];
+      OneSignal.push(() => {
+        OneSignal.init({
+          appId: appId,
+          allowLocalhostAsSecureOrigin: true,
+          notifyButton: {
+            enable: true,
+            position: 'bottom-right',
+            size: 'medium',
+          },
+        });
+      });
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -40,6 +59,9 @@ const App: React.FC = () => {
       <Route path="/mnc"          element={<Guard><MNCPage /></Guard>} />
       <Route path="/leaderboard"  element={<Guard><LeaderboardPage /></Guard>} />
       <Route path="/certificates" element={<Guard><CertificatesPage /></Guard>} />
+      
+      {/* Admin notifications page */}
+      <Route path="/admin-notifications" element={<Guard><AdminNotificationsPage /></Guard>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

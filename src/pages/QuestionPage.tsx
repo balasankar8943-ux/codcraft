@@ -514,7 +514,8 @@ const QuestionPage: React.FC = () => {
             onChange={v => setCode(v || '')}
             options={{
               minimap: { enabled: window.innerWidth > 1024 },
-              fontSize: 14,
+              fontSize: window.innerWidth < 768 ? 16 : 14,
+              lineHeight: window.innerWidth < 768 ? 24 : 20,
               fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace',
               automaticLayout: true,
               tabSize: 4,
@@ -524,9 +525,18 @@ const QuestionPage: React.FC = () => {
               lineNumbersMinChars: 3,
               scrollBeyondLastLine: false,
               smoothScrolling: true,
-              cursorBlinking: 'smooth',
-              renderLineHighlight: 'gutter',
+              cursorBlinking: 'blink',
+              cursorWidth: window.innerWidth < 768 ? 3 : 2,
+              cursorStyle: 'line',
+              renderLineHighlight: 'all',
               bracketPairColorization: { enabled: true },
+              dragAndDrop: false,
+              scrollbar: {
+                vertical: 'visible',
+                horizontal: 'visible',
+                verticalScrollbarSize: window.innerWidth < 768 ? 10 : 8,
+                horizontalScrollbarSize: window.innerWidth < 768 ? 10 : 8
+              }
             }}
           />
         </div>
