@@ -34,7 +34,7 @@ const AppShell: React.FC<Props> = ({ xp = 0, children }) => {
       <header className="app-header">
         {/* Logo */}
         <div className="app-header-logo" onClick={() => navigate('/')}>
-          <img src={`${import.meta.env.BASE_URL}yantrixa-logo.png`} alt="Yantrixa" />
+          <img src={`${import.meta.env.BASE_URL}yantrixa-logo.png`} alt="Yantrixa" width="34" height="34" />
           <span className="name">CodCraft</span>
           <span className="ktu-tag">KTU</span>
         </div>

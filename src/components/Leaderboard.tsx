@@ -25,7 +25,19 @@ const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName, max
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'beginner' | 'mid' | 'pro'>('all');
+  const [visibleCount, setVisibleCount] = useState(50);
   const isSandbox = user?.id === 'sandbox_user_id';
+
+  useEffect(() => {
+    setVisibleCount(50);
+  }, [filter, scores]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    if (target.scrollHeight - target.scrollTop <= target.clientHeight + 100) {
+      setVisibleCount(prev => Math.min(prev + 50, scores.length));
+    }
+  };
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -111,14 +123,27 @@ const Leaderboard: React.FC<Props> = ({ refreshTrigger, currentUserFullName, max
           <p style={{ fontSize:'0.72rem', color:'var(--muted2)', lineHeight:1.5 }}>Sign up with a real email and password to appear on the global leaderboard and compete with other students.</p>
         </div>
       ) : loading ? (
-        <p style={{ textAlign:'center', fontSize:'0.8rem', color:'var(--muted)', padding:'1.5rem 0' }}>Loading ranks…</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+          <style>{`
+            @keyframes pulse {
+              0%, 100% { opacity: 0.35; }
+              50% { opacity: 0.65; }
+            }
+          `}</style>
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} style={{ height: '42px', background: 'var(--bg2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', animation: 'pulse 1.5s infinite ease-in-out' }} />
+          ))}
+        </div>
       ) : error ? (
         <p style={{ textAlign:'center', fontSize:'0.8rem', color:'var(--danger)', padding:'1.5rem 0' }}>{error}</p>
       ) : scores.length === 0 ? (
         <p style={{ textAlign:'center', fontSize:'0.8rem', color:'var(--muted)', padding:'1.5rem 0' }}>No users in this tier yet.</p>
       ) : (
-        <div style={{ display:'flex', flexDirection:'column', gap:'0.3rem', maxHeight, overflowY:'auto', paddingRight:'0.15rem' }}>
-          {scores.map((s, idx) => {
+        <div 
+          onScroll={handleScroll}
+          style={{ display:'flex', flexDirection:'column', gap:'0.3rem', maxHeight, overflowY:'auto', paddingRight:'0.15rem' }}
+        >
+          {scores.slice(0, visibleCount).map((s, idx) => {
             const rank = idx + 1;
             return (
               <div key={s.id} className={`lb-row${s.isCurrentUser ? ' me' : ''}`}>

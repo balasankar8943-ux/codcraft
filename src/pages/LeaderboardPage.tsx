@@ -7,8 +7,12 @@ import Leaderboard from '../components/Leaderboard';
 
 const LeaderboardPage: React.FC = () => {
   const { user } = useAuth();
-  const [xp, setXp] = useState(0);
-  const [fullName, setFullName] = useState('');
+  const [xp, setXp] = useState<number>(() => {
+    return user ? parseInt(localStorage.getItem(`codcraft_xp_${user.id}`) || '0', 10) : 0;
+  });
+  const [fullName, setFullName] = useState<string>(() => {
+    return user ? (localStorage.getItem(`codcraft_fullname_${user.id}`) || user.email?.split('@')[0] || '') : '';
+  });
 
   useEffect(() => {
     if (!user) return;

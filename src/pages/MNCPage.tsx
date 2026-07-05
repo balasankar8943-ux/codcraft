@@ -7,7 +7,9 @@ import MNCSection from '../components/MNCSection';
 
 const MNCPage: React.FC = () => {
   const { user } = useAuth();
-  const [xp, setXp] = useState(0);
+  const [xp, setXp] = useState<number>(() => {
+    return user ? parseInt(localStorage.getItem(`codcraft_xp_${user.id}`) || '0', 10) : 0;
+  });
 
   useEffect(() => {
     if (!user) return;

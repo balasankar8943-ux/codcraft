@@ -12,14 +12,49 @@ import questionsData from '../data/questions.json';
 const PracticePage: React.FC = () => {
   const { user } = useAuth();
   const navigate  = useNavigate();
-  const [xp,    setXp]    = useState(0);
-  const [level, setLevel] = useState('beginner');
-  const [fullName, setFullName] = useState('');
-  const [recentSubs, setRecentSubs] = useState<boolean[]>([]);
-  const [accuracy, setAccuracy] = useState(100);
+  
+  const [xp, setXp] = useState<number>(() => {
+    return user ? parseInt(localStorage.getItem(`codcraft_xp_${user.id}`) || '0', 10) : 0;
+  });
+  const [level, setLevel] = useState<string>(() => {
+    return user ? (localStorage.getItem(`codcraft_level_${user.id}`) || 'beginner') : 'beginner';
+  });
+  const [fullName, setFullName] = useState<string>(() => {
+    return user ? (localStorage.getItem(`codcraft_fullname_${user.id}`) || user.email?.split('@')[0] || '') : '';
+  });
+  const [recentSubs, setRecentSubs] = useState<boolean[]>(() => {
+    if (!user) return [];
+    const lvl = localStorage.getItem(`codcraft_level_${user.id}`) || 'beginner';
+    return JSON.parse(localStorage.getItem(`codcraft_submissions_${user.id}_${lvl}`) || '[]');
+  });
+  const [accuracy, setAccuracy] = useState<number>(() => {
+    if (!user) return 100;
+    const lvl = localStorage.getItem(`codcraft_level_${user.id}`) || 'beginner';
+    const hist = JSON.parse(localStorage.getItem(`codcraft_submissions_${user.id}_${lvl}`) || '[]');
+    return hist.length > 0 ? Math.round(hist.filter(Boolean).length / hist.length * 100) : 100;
+  });
   const [showOnboard, setShowOnboard] = useState(false);
-  const [daily, setDaily] = useState<any>(null);
-  const [dailySolved, setDailySolved] = useState(false);
+  const [daily, setDaily] = useState<any>(() => {
+    if (!user) return null;
+    const lvl = localStorage.getItem(`codcraft_level_${user.id}`) || 'beginner';
+    const qs = (questionsData as any).coding.filter((q: any) => q.level === lvl);
+    if (qs.length > 0) {
+      const dayIdx = Math.floor(Date.now() / 86400000) % qs.length;
+      return qs[dayIdx];
+    }
+    return null;
+  });
+  const [dailySolved, setDailySolved] = useState<boolean>(() => {
+    if (!user) return false;
+    const lvl = localStorage.getItem(`codcraft_level_${user.id}`) || 'beginner';
+    const qs = (questionsData as any).coding.filter((q: any) => q.level === lvl);
+    if (qs.length > 0) {
+      const dayIdx = Math.floor(Date.now() / 86400000) % qs.length;
+      const d = qs[dayIdx];
+      return localStorage.getItem(`codcraft_solved_${user.id}_${d.id}`) === 'true';
+    }
+    return false;
+  });
 
   useEffect(() => {
     if (!user) return;
