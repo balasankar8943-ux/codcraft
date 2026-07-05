@@ -47,7 +47,12 @@ const PracticePage: React.FC = () => {
         const dayIdx = Math.floor(Date.now() / 86400000) % qs.length;
         const d = qs[dayIdx];
         setDaily(d);
-        setDailySolved(solved.includes(d.id));
+        const isDailySolved = solved.some((item: any) => {
+          if (typeof item === 'number') return item === d.id;
+          if (item && typeof item === 'object') return item.id === d.id;
+          return false;
+        });
+        setDailySolved(isDailySolved);
       }
 
       const hist: boolean[] = JSON.parse(localStorage.getItem(`codcraft_submissions_${user.id}_${lvl}`) || '[]');

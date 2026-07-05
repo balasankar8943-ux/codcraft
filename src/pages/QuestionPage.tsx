@@ -123,12 +123,44 @@ const QuestionPage: React.FC = () => {
     const limit = getTimeLimit(question.level);
     setTimeLeft(limit);
 
-    const savedKey = `codcraft_code_${user.id}_${question.id}_${language}`;
-    const saved = localStorage.getItem(savedKey);
-    setCode(saved ?? (question.templates?.[language] || ''));
+    const loadSavedCode = async () => {
+      let dbCode: string | null = null;
+      try {
+        const { data } = await supabase.from('student_progress').select('solved_questions').eq('email', user.email).single();
+        const solvedList = data?.solved_questions || [];
+        const match = solvedList.find((item: any) => item && typeof item === 'object' && item.id === question.id && item.lang === language);
+        if (match && typeof match === 'object') {
+          dbCode = match.code;
+        }
+      } catch (err) {
+        console.warn("Could not load code from Supabase:", err);
+      }
+
+      const savedKey = `codcraft_code_${user.id}_${question.id}_${language}`;
+      const saved = localStorage.getItem(savedKey);
+      setCode(dbCode ?? saved ?? (question.templates?.[language] || ''));
+    };
+    loadSavedCode();
 
     if (localStorage.getItem(`codcraft_solved_${user.id}_${question.id}`) === 'true') {
       setSolved(true);
+    } else {
+      const checkSolvedStatus = async () => {
+        try {
+          const { data } = await supabase.from('student_progress').select('solved_questions').eq('email', user.email).single();
+          const solvedList = data?.solved_questions || [];
+          const isSolvedDb = solvedList.some((item: any) => {
+            if (typeof item === 'number') return item === question.id;
+            if (item && typeof item === 'object') return item.id === question.id;
+            return false;
+          });
+          if (isSolvedDb) {
+            setSolved(true);
+            localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
+          }
+        } catch {}
+      };
+      checkSolvedStatus();
     }
   }, [question?.id, language, user?.id]);
 
@@ -231,34 +263,59 @@ const QuestionPage: React.FC = () => {
         .select('solved_count, wrong_count, solved_questions')
         .eq('email', user.email).single();
 
-      const solvedQs: number[] = Array.isArray(prog?.solved_questions) ? [...prog.solved_questions] : [];
-      const alreadySolved = solvedQs.includes(question.id);
+      const solvedQs: any[] = Array.isArray(prog?.solved_questions) ? [...prog.solved_questions] : [];
+      const alreadySolvedIndex = solvedQs.findIndex((item: any) => {
+        if (typeof item === 'number') return item === question.id;
+        if (item && typeof item === 'object') return item.id === question.id;
+        return false;
+      });
+      const alreadySolved = alreadySolvedIndex !== -1;
 
-      if (!alreadySolved) {
-        solvedQs.push(question.id);
-        const newSolvedCount = (prog?.solved_count ?? 0) + 1;
-        const potentialXp = newSolvedCount * 20 - (prog?.wrong_count ?? 0) * 5;
-        const newXp = Math.max(0, potentialXp);
-        const newLevel = newXp >= 300 ? 'pro' : newXp >= 100 ? 'mid' : 'beginner';
+      // Filter out duplicate entries for this language of this question
+      let updatedSolvedQs = solvedQs.filter((item: any) => {
+        if (typeof item === 'number') return item !== question.id;
+        if (item && typeof item === 'object') {
+          return item.id !== question.id || item.lang !== language;
+        }
+        return true;
+      });
 
-        await supabase.from('student_progress').update({
-          solved_count: newSolvedCount,
-          solved_questions: solvedQs,
-          level: newLevel,
-        }).eq('email', user.email);
-        await supabase.from('student_profiles').update({ level: newLevel }).eq('id', user.id);
+      // Add the new submission object containing the code
+      updatedSolvedQs.push({
+        id: question.id,
+        code: code,
+        lang: language
+      });
 
-        localStorage.setItem(`codcraft_xp_${user.id}`, String(newXp));
-        localStorage.setItem(`codcraft_level_${user.id}`, newLevel);
-      }
+      const newSolvedCount = alreadySolved ? (prog?.solved_count ?? 0) : ((prog?.solved_count ?? 0) + 1);
+      const potentialXp = newSolvedCount * 20 - (prog?.wrong_count ?? 0) * 5;
+      const newXp = Math.max(0, potentialXp);
+      const newLevel = newXp >= 300 ? 'pro' : newXp >= 100 ? 'mid' : 'beginner';
 
+      await supabase.from('student_progress').update({
+        solved_count: newSolvedCount,
+        solved_questions: updatedSolvedQs,
+        level: newLevel,
+      }).eq('email', user.email);
+      await supabase.from('student_profiles').update({ level: newLevel }).eq('id', user.id);
+
+      localStorage.setItem(`codcraft_xp_${user.id}`, String(newXp));
+      localStorage.setItem(`codcraft_level_${user.id}`, newLevel);
       localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
+
+      // Save code locally immediately
+      const savedKey = `codcraft_code_${user.id}_${question.id}_${language}`;
+      localStorage.setItem(savedKey, code);
+
       setSolved(true);
       setFloatXp(`+${xpEarned} XP${isDaily ? ' 🔥 Daily Bonus!' : ''}`);
       setTimeout(() => setFloatXp(null), 3500);
-    } catch {
+    } catch (err) {
+      console.error("Submit failed:", err);
       // Offline fallback
       localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
+      const savedKey = `codcraft_code_${user.id}_${question.id}_${language}`;
+      localStorage.setItem(savedKey, code);
       setSolved(true);
       setFloatXp(`+${xpEarned} XP${isDaily ? ' 🔥 Daily Bonus!' : ''}`);
       setTimeout(() => setFloatXp(null), 3500);
@@ -304,7 +361,7 @@ const QuestionPage: React.FC = () => {
           </select>
 
           {/* Run */}
-          <button onClick={runCode} disabled={isRunning || (solved && !isDaily) || timeLeft <= 0}
+          <button onClick={runCode} disabled={isRunning || timeLeft <= 0}
             className="qp-run-btn"
             style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.38rem 0.85rem', background: 'transparent', border: '1px solid #555', borderRadius: '6px', color: '#ccc', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', opacity: (isRunning || timeLeft <= 0) ? 0.5 : 1 }}>
             <PlayIcon /> {isRunning ? 'Running…' : 'Run'}

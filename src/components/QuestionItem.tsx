@@ -39,14 +39,19 @@ const QuestionItem: React.FC<Props> = ({ question }) => {
   useEffect(() => {
     if (!user) return;
 
-    // Check solved status
     const locally = localStorage.getItem(`codcraft_solved_${user.id}_${question.id}`);
     if (locally === 'true') {
       setIsSolved(true);
     } else {
       const checkSolvedStatus = async () => {
         const { data } = await supabase.from('student_progress').select('solved_questions').eq('email', user.email).single();
-        if (data?.solved_questions?.includes(question.id)) {
+        const solved = data?.solved_questions || [];
+        const isSolvedDb = solved.some((item: any) => {
+          if (typeof item === 'number') return item === question.id;
+          if (item && typeof item === 'object') return item.id === question.id;
+          return false;
+        });
+        if (isSolvedDb) {
           setIsSolved(true);
           localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
         }
