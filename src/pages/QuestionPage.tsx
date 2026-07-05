@@ -334,7 +334,7 @@ const QuestionPage: React.FC = () => {
       {/* ── Top Bar ─────────────────────────────────────────── */}
       <div className="qp-topbar">
         <button className="qp-back-btn" onClick={() => navigate(-1)}>
-          <ArrowLeft /> Back
+          <ArrowLeft /> <span className="qp-back-text">Back</span>
         </button>
 
         <div className="qp-title-area">
@@ -539,6 +539,25 @@ const QuestionPage: React.FC = () => {
           to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
       `}</style>
+      {/* ── Mobile Sticky Bottom Action Bar ───────────────── */}
+      <div className="qp-mobile-bottom-bar">
+        <button 
+          onClick={runCode} 
+          disabled={isRunning || timeLeft <= 0} 
+          className="btn btn-outline" 
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.65rem 0' }}
+        >
+          <PlayIcon /> {isRunning ? 'Running…' : 'Run Code'}
+        </button>
+        <button 
+          onClick={submitSolution} 
+          disabled={isRunning || isSubmitting || solved || !allPass || timeLeft <= 0}
+          className={`btn ${solved ? 'btn-outline' : allPass ? 'btn-primary' : 'btn-outline'}`}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', opacity: (solved || (!allPass && !solved)) ? 0.6 : 1, padding: '0.65rem 0' }}
+        >
+          <CheckIcon /> {isSubmitting ? 'Submitting…' : solved ? 'Solved! ✓' : `Submit (${xpLabel})`}
+        </button>
+      </div>
     </div>
   );
 };
