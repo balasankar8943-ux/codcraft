@@ -15,24 +15,7 @@ import AdminNotificationsPage from './pages/AdminNotificationsPage';
 const App: React.FC = () => {
   const { user, loading } = useAuth();
 
-  React.useEffect(() => {
-    const appId = import.meta.env.VITE_ONESIGNAL_APP_ID;
-    if (appId) {
-      const OneSignalDeferred = (window as any).OneSignalDeferred || [];
-      (window as any).OneSignalDeferred = OneSignalDeferred;
-      OneSignalDeferred.push(async (OneSignal: any) => {
-        await OneSignal.init({
-          appId: appId,
-          allowLocalhostAsSecureOrigin: true,
-          notifyButton: {
-            enable: true,
-            position: 'bottom-right',
-            size: 'medium',
-          },
-        });
-      });
-    }
-  }, []);
+  // OneSignal is initialized directly inside index.html for reliable static verification
 
   if (loading) {
     return (
