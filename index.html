@@ -11,22 +11,26 @@
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-          appId: "1d4546f5-b8ae-41e1-8ced-43a5392131e7",
-          allowLocalhostAsSecureOrigin: true,
-          notifyButton: {
-            enable: true,
-            position: 'bottom-left',
-            size: 'medium',
-            theme: 'default',
-            colors: {
-              'circle.background': '#6366f1',
-              'circle.foreground': '#ffffff',
-              'badge.background': '#6366f1',
-              'badge.foreground': '#ffffff',
+        try {
+          await OneSignal.init({
+            appId: "1d4546f5-b8ae-41e1-8ced-43a5392131e7",
+            allowLocalhostAsSecureOrigin: true,
+            notifyButton: {
+              enable: true,
+              position: 'bottom-left',
+              size: 'medium',
+              theme: 'default',
+              colors: {
+                'circle.background': '#6366f1',
+                'circle.foreground': '#ffffff',
+                'badge.background': '#6366f1',
+                'badge.foreground': '#ffffff',
+              }
             }
-          }
-        });
+          });
+        } catch (err) {
+          console.warn("OneSignal failed to initialize (this is normal on non-production domains):", err.message);
+        }
       });
     </script>
     
