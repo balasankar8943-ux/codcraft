@@ -6,6 +6,7 @@ import { useAuth } from '../components/AuthProvider';
 import { supabase } from '../supabaseClient';
 import Editor from '@monaco-editor/react';
 import questionsData from '../data/questions.json';
+import AIHintAssistant from '../components/AIHintAssistant';
 
 // ── Lucide icons inline (avoid import issues) ───────────────
 const ArrowLeft = () => (
@@ -568,6 +569,16 @@ const QuestionPage: React.FC = () => {
           <CheckIcon /> {isSubmitting ? 'Submitting…' : solved ? 'Solved! ✓' : `Submit (${xpLabel})`}
         </button>
       </div>
+
+      {/* ── AI Hint Assistant (optional floating button) ──── */}
+      <AIHintAssistant
+        questionTitle={question.title}
+        questionContent={question.content}
+        questionLevel={question.level}
+        language={language}
+        code={code}
+        testCases={question.testCases}
+      />
     </div>
   );
 };
