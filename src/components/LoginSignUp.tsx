@@ -15,30 +15,25 @@ const LoginSignUp: React.FC = () => {
 
   useEffect(() => {
     let active = true;
-    const checkPermission = () => {
-      const OneSignal = (window as any).OneSignal;
-      if (OneSignal && OneSignal.Notifications) {
-        if (active) setSubState(OneSignal.Notifications.permission);
-      } else {
-        setTimeout(() => {
-          if (active) checkPermission();
-        }, 1000);
-      }
-    };
-    checkPermission();
+    const OneSignalDeferred = (window as any).OneSignalDeferred || [];
+    (window as any).OneSignalDeferred = OneSignalDeferred;
+    OneSignalDeferred.push((OneSignal: any) => {
+      if (active) setSubState(OneSignal.Notifications.permission);
+    });
     return () => { active = false; };
   }, []);
 
-  const handleSubscribe = async () => {
-    const OneSignal = (window as any).OneSignal;
-    if (OneSignal && OneSignal.Notifications) {
+  const handleSubscribe = () => {
+    const OneSignalDeferred = (window as any).OneSignalDeferred || [];
+    (window as any).OneSignalDeferred = OneSignalDeferred;
+    OneSignalDeferred.push(async (OneSignal: any) => {
       try {
         await OneSignal.Notifications.requestPermission();
         setSubState(OneSignal.Notifications.permission);
       } catch (err) {
         console.error('Subscription error:', err);
       }
-    }
+    });
   };
 
   useEffect(() => {
