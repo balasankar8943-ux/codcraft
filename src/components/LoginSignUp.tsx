@@ -11,30 +11,6 @@ const LoginSignUp: React.FC = () => {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
   const [success, setSuccess]   = useState<string | null>(null);
-  const [subState, setSubState] = useState<'default' | 'granted' | 'denied' | 'checking'>('checking');
-
-  useEffect(() => {
-    let active = true;
-    const OneSignalDeferred = (window as any).OneSignalDeferred || [];
-    (window as any).OneSignalDeferred = OneSignalDeferred;
-    OneSignalDeferred.push((OneSignal: any) => {
-      if (active) setSubState(OneSignal.Notifications.permission);
-    });
-    return () => { active = false; };
-  }, []);
-
-  const handleSubscribe = () => {
-    const OneSignalDeferred = (window as any).OneSignalDeferred || [];
-    (window as any).OneSignalDeferred = OneSignalDeferred;
-    OneSignalDeferred.push(async (OneSignal: any) => {
-      try {
-        await OneSignal.Notifications.requestPermission();
-        setSubState(OneSignal.Notifications.permission);
-      } catch (err) {
-        console.error('Subscription error:', err);
-      }
-    });
-  };
 
   useEffect(() => {
     if (user) {
@@ -222,49 +198,7 @@ const LoginSignUp: React.FC = () => {
               {loading ? 'Please wait…' : isLogin ? 'Sign In' : 'Create Account'}
             </button>
           </form>
-
-          {/* Push Notifications subscription section */}
-          <div className="login-notifications-box" style={{
-            marginTop: '1.25rem',
-            padding: '0.85rem 1rem',
-            background: '#1a1a1f',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '0.75rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-              <span style={{ fontSize: '1.25rem' }}>🔔</span>
-              <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text)' }}>Push Alerts</div>
-                <div style={{ fontSize: '0.68rem', color: 'var(--muted2)', marginTop: '0.1rem' }}>
-                  Get challenge updates on your phone.
-                </div>
-              </div>
-            </div>
-            {subState === 'granted' ? (
-              <span style={{ fontSize: '0.72rem', color: 'var(--success)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                ✓ Active
-              </span>
-            ) : subState === 'denied' ? (
-              <span style={{ fontSize: '0.68rem', color: 'var(--danger)', fontWeight: 600 }} title="Reset permissions in your browser address bar.">
-                ⚠️ Blocked
-              </span>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSubscribe}
-                className="btn btn-outline btn-sm"
-                style={{ fontSize: '0.72rem', padding: '0.3rem 0.6rem', border: '1px solid var(--indigo)', color: 'var(--indigo)' }}
-              >
-                Subscribe
-              </button>
-            )}
-          </div>
-
-          <div className="footer-note" style={{ marginTop: '1rem' }}>
+          <div className="footer-note">
             Secured by Supabase Auth · Built by{' '}
             <a href="https://yantrixa.in" target="_blank" rel="noopener noreferrer">yantrixa.in</a>
           </div>
