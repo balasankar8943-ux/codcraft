@@ -67,7 +67,8 @@ const navItems = [
   { key: 'practice',     label: 'Practice Arena',  icon: <Icon.Code /> },
   { key: 'mnc',          label: 'MNC Prep',         icon: <Icon.Building /> },
   { key: 'certificates', label: 'My Certificates',  icon: <Icon.Certificate /> },
-  { key: 'leaderboard',  label: 'Leaderboard',      icon: <Icon.Trophy /> },
+  { key: 'leaderboard',  label: 'Student Standings', icon: <Icon.Trophy /> },
+  { key: 'colleges',     label: 'College Standings', icon: <Icon.Building /> },
 ] as const;
 
 type TabKey = typeof navItems[number]['key'];
@@ -104,6 +105,7 @@ const HomePage: React.FC = () => {
   if (currentPath === '/mnc') activeTab = 'mnc';
   else if (currentPath === '/certificates') activeTab = 'certificates';
   else if (currentPath === '/leaderboard') activeTab = 'leaderboard';
+  else if (currentPath === '/colleges') activeTab = 'colleges';
 
   const openProfileModal = () => {
     setTempFullName(fullName);
@@ -567,6 +569,7 @@ const HomePage: React.FC = () => {
     else if (tab === 'mnc') navigateRouter('/mnc');
     else if (tab === 'certificates') navigateRouter('/certificates');
     else if (tab === 'leaderboard') navigateRouter('/leaderboard');
+    else if (tab === 'colleges') navigateRouter('/colleges');
   };
 
   return (
@@ -794,18 +797,42 @@ const HomePage: React.FC = () => {
             <CertificateGenerator xp={xp} />
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'leaderboard' ? (
         <div className="dashboard-layout" style={{ display: 'block', padding: '1.5rem' }}>
-          {/* Global Leaderboard Standings Page */}
+          {/* Global Student Leaderboard Standings Page */}
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <div className="card card-p leaderboard-page-wrap">
               <div className="flex justify-between items-center mb-4" style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <h2 style={{ fontSize: '1.35rem', color: 'var(--text)', fontWeight: 800 }}>
-                  Global Leaderboard Standings
+                  Global Student Standings
                 </h2>
                 <span className="badge badge-green">Live Updates</span>
               </div>
-              <Leaderboard refreshTrigger={xp} currentUserFullName={fullName} currentUserCollege={college} />
+              <Leaderboard initialViewMode="students" refreshTrigger={xp} currentUserFullName={fullName} currentUserCollege={college} />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="dashboard-layout" style={{ display: 'block', padding: '1.5rem' }}>
+          {/* Dedicated College Standings Page */}
+          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <div className="card card-p leaderboard-page-wrap" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <div className="flex justify-between items-center" style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <h2 style={{ fontSize: '1.35rem', color: 'var(--text)', fontWeight: 800 }}>
+                    🏢 KTU College Standings
+                  </h2>
+                  <span className="badge badge-indigo">Quality Ranked</span>
+                </div>
+                <div style={{
+                  background: 'var(--indigo-bg)', border: '1px solid rgba(99, 102, 241, 0.2)',
+                  borderRadius: 'var(--radius-sm)', padding: '0.85rem 1rem', fontSize: '0.78rem',
+                  lineHeight: 1.5, color: 'var(--indigo)'
+                }}>
+                  💡 <strong>How Rankings Work</strong>: Colleges are ranked by their <strong>Quality Rating</strong> (Average XP per student). This rewards colleges with higher coding engagement and caliber per student, rather than just large campus size!
+                </div>
+              </div>
+              <Leaderboard initialViewMode="colleges" refreshTrigger={xp} currentUserFullName={fullName} currentUserCollege={college} />
             </div>
           </div>
         </div>

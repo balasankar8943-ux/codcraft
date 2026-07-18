@@ -8,6 +8,8 @@ const LoginSignUp: React.FC = () => {
   const [isLogin, setIsLogin]   = useState(true);
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [collegeName, setCollegeName] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
   const [success, setSuccess]   = useState<string | null>(null);
@@ -27,7 +29,10 @@ const LoginSignUp: React.FC = () => {
         setSuccess('Logged in! Redirecting…');
         setTimeout(() => navigate('/'), 900);
       } else {
-        await signUp(email, password);
+        if (!fullName.trim() || !collegeName.trim()) {
+          throw new Error('Please fill in your username and college name.');
+        }
+        await signUp(email, password, fullName.trim(), collegeName.trim());
         setSuccess('Account created! Signing you in…');
         setTimeout(async () => {
           try { await signIn(email, password); navigate('/'); }
@@ -150,6 +155,50 @@ const LoginSignUp: React.FC = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit}>
+            {!isLogin && (
+              <>
+                <div className="form-group">
+                  <label className="form-label">Username / Display Name</label>
+                  <div className="input-with-icon">
+                    <svg className="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="e.g. Balasankar"
+                      value={fullName}
+                      onChange={e => setFullName(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">College Name</label>
+                  <div className="input-with-icon">
+                    <svg className="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+                      <line x1="9" y1="22" x2="9" y2="16"/>
+                      <line x1="15" y1="22" x2="15" y2="16"/>
+                      <line x1="9" y1="16" x2="15" y2="16"/>
+                    </svg>
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="e.g. CET Trivandrum"
+                      value={collegeName}
+                      onChange={e => setCollegeName(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
             <div className="form-group">
               <label className="form-label">Email Address</label>
               <div className="input-with-icon">

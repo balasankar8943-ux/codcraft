@@ -16,6 +16,7 @@ type CollegeScore = {
   college: string;
   studentCount: number;
   totalXP: number;
+  qualityRating: number;
   isCurrentUserCollege?: boolean;
 };
 
@@ -25,6 +26,7 @@ interface Props {
   currentUserCollege?: string | null;
   maxHeight?: string;
   limit?: number;
+  initialViewMode?: 'students' | 'colleges';
 }
 
 const Leaderboard: React.FC<Props> = ({ 
@@ -32,7 +34,8 @@ const Leaderboard: React.FC<Props> = ({
   currentUserFullName, 
   currentUserCollege,
   maxHeight = '450px', 
-  limit = 1000 
+  limit = 1000,
+  initialViewMode = 'students'
 }) => {
   const { user } = useAuth();
 
@@ -40,7 +43,7 @@ const Leaderboard: React.FC<Props> = ({
   const [collegeScores, setCollegeScores] = useState<CollegeScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'students' | 'colleges'>('students');
+  const [viewMode, setViewMode] = useState<'students' | 'colleges'>(initialViewMode);
   const [filter, setFilter] = useState<'all' | 'beginner' | 'mid' | 'pro'>('all');
   const [visibleCount, setVisibleCount] = useState(50);
   const isSandbox = user?.id === 'sandbox_user_id';
@@ -112,13 +115,17 @@ const Leaderboard: React.FC<Props> = ({
         });
 
         const processedColleges = Object.values(collegeMap)
-          .map(c => ({
-            college: c.college,
-            studentCount: c.count,
-            totalXP: c.totalXP,
-            isCurrentUserCollege: currentUserCollege ? c.college.toLowerCase() === currentUserCollege.toLowerCase() : false
-          }))
-          .sort((a, b) => b.totalXP - a.totalXP);
+          .map(c => {
+            const avgXP = c.count > 0 ? Math.round(c.totalXP / c.count) : 0;
+            return {
+              college: c.college,
+              studentCount: c.count,
+              totalXP: c.totalXP,
+              qualityRating: avgXP,
+              isCurrentUserCollege: currentUserCollege ? c.college.toLowerCase() === currentUserCollege.toLowerCase() : false
+            };
+          })
+          .sort((a, b) => b.qualityRating !== a.qualityRating ? b.qualityRating - a.qualityRating : b.totalXP - a.totalXP);
 
         setCollegeScores(processedColleges);
         setLoading(false);
@@ -245,8 +252,10 @@ const Leaderboard: React.FC<Props> = ({
                       🏢 {c.college}
                       {c.isCurrentUserCollege && <span style={{ marginLeft:'0.4rem', fontSize:'0.65rem', color:'var(--gold2)' , fontWeight:700 }}>YOUR COLLEGE</span>}
                     </div>
-                    <div style={{ fontSize:'0.68rem', color:'var(--muted)' }}>
-                      {c.studentCount} student{c.studentCount > 1 ? 's' : ''} active
+                    <div style={{ fontSize:'0.68rem', color:'var(--muted)', display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <span>👥 {c.studentCount} student{c.studentCount > 1 ? 's' : ''}</span>
+                      <span style={{ color: 'var(--border)' }}>·</span>
+                      <span style={{ color: 'var(--success)', fontWeight: 700 }}>⭐ Quality: {c.qualityRating} XP/student</span>
                     </div>
                   </div>
                   <span style={{ fontFamily:'var(--mono)', fontWeight:900, fontSize:'0.85rem', color:c.isCurrentUserCollege?'var(--indigo)':'var(--text)', minWidth:'4.5rem', textAlign:'right' }}>

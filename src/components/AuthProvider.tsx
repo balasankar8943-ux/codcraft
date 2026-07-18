@@ -9,7 +9,7 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName?: string, college?: string) => Promise<void>;
   signInSandbox: (email?: string) => void;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -101,9 +101,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (error) throw error;
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, fullName?: string, college?: string) => {
     localStorage.removeItem('codcraft_logged_in_user');
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name: fullName,
+          college: college
+        }
+      }
+    });
     if (error) throw error;
   };
 
