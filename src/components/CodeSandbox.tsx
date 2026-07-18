@@ -61,7 +61,11 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
 
   // Reset/Initialize editor and timer on problem or language change
   useEffect(() => {
-    if (question.templates && question.templates[language]) {
+    const draftKey = `codcraft_draft_${user?.id || 'guest'}_${question.id}_${language}`;
+    const savedDraft = localStorage.getItem(draftKey);
+    if (savedDraft !== null) {
+      setCode(savedDraft);
+    } else if (question.templates && question.templates[language]) {
       setCode(question.templates[language]);
     } else {
       setCode('');
@@ -71,7 +75,7 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
     setSolved(false);
     setExecutionMessage(null);
     setTimeLeft(getInitialTimeLimit(question.level));
-  }, [question, language]);
+  }, [question, language, user]);
 
   // Timer countdown hook
   useEffect(() => {
@@ -345,19 +349,49 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
         )}
 
         {/* Editor controls */}
-        <div className="sandbox-toolbar">
+        <div className="sandbox-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text2)' }}>Monaco Code Editor</span>
-          <select
-            value={language}
-            onChange={e => setLanguage(e.target.value)}
-            className="select"
-            style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem', borderRadius: '6px' }}
-          >
-            <option value="python">Python 3</option>
-            <option value="cpp">C++ (GCC)</option>
-            <option value="c">C (GCC)</option>
-            <option value="java">Java (OpenJDK)</option>
-          </select>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              type="button"
+              onClick={() => {
+                if (confirm("Reset editor to default template? Your current changes will be lost.")) {
+                  const defaultTemplate = question.templates[language] || '';
+                  setCode(defaultTemplate);
+                  const draftKey = `codcraft_draft_${user?.id || 'guest'}_${question.id}_${language}`;
+                  localStorage.removeItem(draftKey);
+                }
+              }}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border)',
+                borderRadius: '6px',
+                padding: '0.3rem 0.6rem',
+                fontSize: '0.7rem',
+                color: 'var(--muted)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.2rem',
+                fontWeight: 600,
+                fontFamily: 'var(--font)'
+              }}
+              title="Reset code to default template"
+            >
+              <RotateCcw size={11} /> Reset
+            </button>
+            <select
+              value={language}
+              onChange={e => setLanguage(e.target.value)}
+              className="select"
+              style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem', borderRadius: '6px', background: 'var(--bg2)', color: 'var(--text)', border: '1px solid var(--border)' }}
+            >
+              <option value="python">Python 3</option>
+              <option value="cpp">C++ (GCC)</option>
+              <option value="c">C (GCC)</option>
+              <option value="java">Java (OpenJDK)</option>
+            </select>
+          </div>
         </div>
 
         {/* Monaco Editor */}
@@ -367,7 +401,12 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
             language={language === 'cpp' || language === 'c' ? 'cpp' : language}
             theme="vs-dark"
             value={code}
-            onChange={value => setCode(value || '')}
+            onChange={value => {
+              const val = value || '';
+              setCode(val);
+              const draftKey = `codcraft_draft_${user?.id || 'guest'}_${question.id}_${language}`;
+              localStorage.setItem(draftKey, val);
+            }}
             options={{
               minimap: { enabled: false },
               fontSize: 13,
@@ -482,31 +521,32 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
           ))}
         </div>
 
-        {/* Compile / Submit Buttons */}
-        <div style={{ display: 'flex', gap: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border)', marginTop: 'auto' }}>
-          <button
-            onClick={executeCode}
-            disabled={isRunning || isSubmitting || solved || timeLeft <= 0}
-            className="btn btn-outline"
-            style={{ flex: 1, padding: '0.7rem' }}
-          >
-            <Play size={12} /> {isRunning ? 'Running...' : 'Run Code'}
-          </button>
-          <button
-            onClick={submitSolution}
-            disabled={
-              isRunning ||
-              isSubmitting ||
-              solved ||
-              timeLeft <= 0 ||
-              !outputs.every(o => o.status === 'pass')
-            }
-            className="btn btn-primary"
-            style={{ flex: 1, padding: '0.7rem' }}
-          >
-            <CheckCircle size={12} /> {isSubmitting ? 'Submitting...' : solved ? 'Solved!' : 'Submit Solution'}
-          </button>
-        </div>
+      </div>
+
+      {/* Compile / Submit Buttons */}
+      <div className="sandbox-bottom-bar">
+        <button
+          onClick={executeCode}
+          disabled={isRunning || isSubmitting || solved || timeLeft <= 0}
+          className="btn btn-outline"
+          style={{ flex: 1, padding: '0.7rem' }}
+        >
+          <Play size={12} /> {isRunning ? 'Running...' : 'Run Code'}
+        </button>
+        <button
+          onClick={submitSolution}
+          disabled={
+            isRunning ||
+            isSubmitting ||
+            solved ||
+            timeLeft <= 0 ||
+            !outputs.every(o => o.status === 'pass')
+          }
+          className="btn btn-primary"
+          style={{ flex: 1, padding: '0.7rem' }}
+        >
+          <CheckCircle size={12} /> {isSubmitting ? 'Submitting...' : solved ? 'Solved!' : 'Submit Solution'}
+        </button>
       </div>
     </div>
   );

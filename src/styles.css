@@ -645,6 +645,16 @@ img { display:block; }
   max-width: 100%;
 }
 @media (max-width:768px) { .sandbox-wrap { grid-template-columns:1fr; } }
+
+.sandbox-bottom-bar {
+  grid-column: span 2;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  box-sizing: border-box;
+}
 .sandbox-editor {
   border-right:1px solid var(--border);
   display:flex;
@@ -1491,6 +1501,11 @@ img { display:block; }
   .sandbox-editor-pane.hide-mobile,
   .sandbox-panel-pane.hide-mobile {
     display: none !important;
+  }
+
+  .sandbox-bottom-bar {
+    grid-column: span 1 !important;
+    padding: 0.65rem 1rem !important;
   }
 
   .sandbox-editor-pane.show-mobile,
