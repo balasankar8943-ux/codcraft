@@ -94,11 +94,50 @@ const HomePage: React.FC = () => {
   const [showLevelUp,  setShowLevelUp]  = useState(false);
   const [levelUpVal,   setLevelUpVal]   = useState(1);
   const [fullName,     setFullName]     = useState('');
+  const [college,      setCollege]      = useState('');
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [tempFullName, setTempFullName] = useState('');
+  const [tempCollege,  setTempCollege]  = useState('');
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   let activeTab: TabKey = 'practice';
   if (currentPath === '/mnc') activeTab = 'mnc';
   else if (currentPath === '/certificates') activeTab = 'certificates';
   else if (currentPath === '/leaderboard') activeTab = 'leaderboard';
+
+  const openProfileModal = () => {
+    setTempFullName(fullName);
+    setTempCollege(college === 'Kerala Engineering Student' ? '' : college);
+    setShowProfileModal(true);
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || isSavingProfile) return;
+    setIsSavingProfile(true);
+    try {
+      const cleanName = tempFullName.trim();
+      const cleanCollege = tempCollege.trim();
+      
+      const { error } = await supabase
+        .from('student_profiles')
+        .update({
+          full_name: cleanName,
+          college: cleanCollege
+        })
+        .eq('id', user.id);
+        
+      if (error) throw error;
+      
+      setFullName(cleanName);
+      setCollege(cleanCollege);
+      setShowProfileModal(false);
+    } catch (err: any) {
+      alert("Failed to update profile: " + err.message);
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
 
   // ── profile fetch ─────────────────────────────────────────
   const fetchProfile = async () => {
@@ -139,6 +178,14 @@ const HomePage: React.FC = () => {
 
       if (profile) {
         setFullName(profile.full_name || '');
+        setCollege(profile.college || '');
+        
+        // Auto open setup modal if college is still the default/unset
+        if (!profile.college || profile.college === 'Kerala Engineering Student') {
+          setTempFullName(profile.full_name || '');
+          setTempCollege('');
+          setShowProfileModal(true);
+        }
       }
       
       const finalLevel = profile?.level || 'beginner';
@@ -229,6 +276,7 @@ const HomePage: React.FC = () => {
       setXp(lxp);
       setLevel(llvl);
       setFullName(user.email ? user.email.split('@')[0] : 'Sandbox Coder');
+      setCollege('Kerala Engineering Student');
       setBadges(JSON.parse(localStorage.getItem(`codcraft_badges_${uid}`) || '[]'));
 
       const diagnosticCompleted = localStorage.getItem(`codcraft_diagnostic_completed_${uid}`) === 'true' || 
@@ -414,6 +462,95 @@ const HomePage: React.FC = () => {
     </div>
   );
 
+  const renderProfileModal = () => {
+    if (!showProfileModal) return null;
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+        backdropFilter: 'blur(4px)'
+      }}>
+        <div style={{
+          background: '#141417', border: '1px solid #27272a', borderRadius: '16px',
+          width: '100%', maxWidth: '400px', padding: '1.5rem', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
+          display: 'flex', flexDirection: 'column', gap: '1rem', position: 'relative'
+        }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fff', fontWeight: 800 }}>
+              Set Up Your Profile 🧑‍💻
+            </h3>
+            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#a1a1aa' }}>
+              Choose a username and enter your college to compete on the leaderboards!
+            </p>
+          </div>
+
+          <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <label style={{ fontSize: '0.72rem', color: '#a1a1aa', fontWeight: 700, textTransform: 'uppercase' }}>
+                Username / Display Name
+              </label>
+              <input
+                type="text"
+                required
+                value={tempFullName}
+                onChange={e => setTempFullName(e.target.value)}
+                placeholder="e.g. Balasankar"
+                style={{
+                  padding: '0.65rem 0.85rem', fontSize: '0.85rem', background: '#1e1e24',
+                  border: '1px solid #27272a', borderRadius: '8px', color: '#fff', outline: 'none'
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <label style={{ fontSize: '0.72rem', color: '#a1a1aa', fontWeight: 700, textTransform: 'uppercase' }}>
+                College Name
+              </label>
+              <input
+                type="text"
+                required
+                value={tempCollege}
+                onChange={e => setTempCollege(e.target.value)}
+                placeholder="e.g. CET Trivandrum"
+                style={{
+                  padding: '0.65rem 0.85rem', fontSize: '0.85rem', background: '#1e1e24',
+                  border: '1px solid #27272a', borderRadius: '8px', color: '#fff', outline: 'none'
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+              {college && college !== 'Kerala Engineering Student' && (
+                <button
+                  type="button"
+                  onClick={() => setShowProfileModal(false)}
+                  style={{
+                    flex: 1, padding: '0.65rem', borderRadius: '8px', border: '1px solid #27272a',
+                    background: 'transparent', color: '#a1a1aa', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={isSavingProfile || !tempFullName.trim() || !tempCollege.trim()}
+                style={{
+                  flex: 2, padding: '0.65rem', borderRadius: '8px', border: 'none',
+                  background: 'var(--indigo)', color: '#fff', fontSize: '0.8rem', fontWeight: 700,
+                  cursor: (isSavingProfile || !tempFullName.trim() || !tempCollege.trim()) ? 'not-allowed' : 'pointer',
+                  opacity: (isSavingProfile || !tempFullName.trim() || !tempCollege.trim()) ? 0.6 : 1
+                }}
+              >
+                {isSavingProfile ? 'Saving...' : 'Save Profile'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   // Daily challenge
   const daily   = (questionsData as any).coding[(new Date().getDate()) % (questionsData as any).coding.length];
   const dailySolved = user ? localStorage.getItem(`codcraft_solved_${user.id}_${daily?.id}`) === 'true' : false;
@@ -498,11 +635,22 @@ const HomePage: React.FC = () => {
               <div className="flex justify-between items-start mb-4" style={{ gap: '1rem' }}>
                 <div>
                   <div className="section-tag">Track Trajectory</div>
-                  <h2 style={{ fontSize: '1.35rem', marginTop: '0.4rem', color: 'var(--text)' }}>
-                    Welcome back, <span style={{ color: 'var(--indigo)' }}>{user?.email?.split('@')[0]}</span>!
+                  <h2 style={{ fontSize: '1.35rem', marginTop: '0.4rem', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    Welcome back, <span style={{ color: 'var(--indigo)' }}>{fullName || user?.email?.split('@')[0]}</span>!
+                    <button 
+                      onClick={openProfileModal}
+                      style={{
+                        background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)',
+                        borderRadius: '6px', padding: '0.25rem 0.5rem', fontSize: '0.65rem',
+                        color: 'var(--indigo)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.2rem',
+                        fontWeight: 700, fontFamily: 'var(--font)'
+                      }}
+                    >
+                      ✏️ Edit Profile
+                    </button>
                   </h2>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem' }}>
-                    Solve KTU-aligned challenges to earn XP and advance your tier.
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    🏢 <strong>{college || 'Kerala Engineering Student'}</strong> · Solve KTU-aligned challenges to earn XP.
                   </p>
                 </div>
                 <span className={`track-badge ${trackClass(level)}`}>
@@ -621,7 +769,7 @@ const HomePage: React.FC = () => {
                 </h3>
                 <span className="badge badge-green" style={{ fontSize: '0.6rem' }}>Live</span>
               </div>
-              <Leaderboard refreshTrigger={xp} currentUserFullName={fullName} />
+              <Leaderboard refreshTrigger={xp} currentUserFullName={fullName} currentUserCollege={college} />
             </div>
 
             {/* Badge Shelf */}
@@ -657,7 +805,7 @@ const HomePage: React.FC = () => {
                 </h2>
                 <span className="badge badge-green">Live Updates</span>
               </div>
-              <Leaderboard refreshTrigger={xp} currentUserFullName={fullName} />
+              <Leaderboard refreshTrigger={xp} currentUserFullName={fullName} currentUserCollege={college} />
             </div>
           </div>
         </div>
@@ -755,6 +903,8 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {renderProfileModal()}
     </div>
   );
 };
