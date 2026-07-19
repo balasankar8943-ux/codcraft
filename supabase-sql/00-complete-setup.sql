@@ -100,6 +100,27 @@ begin
     level = excluded.level,
     updated_at = now();
 
+  -- Auto-create corresponding progress row
+  insert into public.student_progress (
+    email,
+    level,
+    solved_count,
+    attempted_count,
+    wrong_count,
+    score,
+    solved_questions
+  )
+  values (
+    new.email,
+    coalesce(new.raw_user_meta_data ->> 'level', 'beginner'),
+    0,
+    0,
+    0,
+    0,
+    '[]'::jsonb
+  )
+  on conflict (email) do nothing;
+
   return new;
 end;
 $$;
