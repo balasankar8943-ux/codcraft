@@ -255,11 +255,6 @@ const Leaderboard: React.FC<Props> = ({
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:'0.82rem', fontWeight:600, color:'var(--text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatStudentName(s.name, s.college)}</span>
-                      {rank === 1 && (
-                        <span className="badge badge-gold" style={{ fontSize: '0.58rem', padding: '0.1rem 0.35rem', flexShrink: 0 }}>
-                          ⚡ First Blood
-                        </span>
-                      )}
                       {s.isCurrentUser && <span style={{ marginLeft:'0.2rem', fontSize:'0.65rem', color:'var(--gold2)', fontWeight:700, flexShrink: 0 }}>YOU</span>}
                     </div>
                   </div>
