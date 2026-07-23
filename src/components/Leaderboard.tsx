@@ -188,6 +188,35 @@ const Leaderboard: React.FC<Props> = ({
         </div>
       )}
 
+      {/* Weekly League Sprint Banner for Colleges */}
+      {viewMode === 'colleges' && (
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(245,158,11,0.08) 100%)',
+          border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
+          padding: '0.65rem 0.85rem', fontSize: '0.75rem', color: 'var(--text2)', flexWrap: 'wrap', gap: '0.4rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700 }}>
+            <span>⚔️ <strong>KTU Campus Clash League</strong></span>
+            <span className="badge badge-gold" style={{ fontSize: '0.6rem' }}>Weekly Sprint</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontFamily: 'var(--mono)', fontSize: '0.72rem', color: 'var(--indigo)', fontWeight: 700 }}>
+            <span>⏱️ Sprint Ends:</span>
+            <span>{(() => {
+              const now = new Date();
+              const day = now.getDay();
+              const diff = (7 - day + 1) % 7 || 7;
+              const nextMonday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff, 0, 0, 0);
+              const totalSecs = Math.max(0, Math.floor((nextMonday.getTime() - now.getTime()) / 1000));
+              const days = Math.floor(totalSecs / (3600 * 24));
+              const hours = Math.floor((totalSecs % (3600 * 24)) / 3600);
+              const mins = Math.floor((totalSecs % 3600) / 60);
+              return `${days}d ${hours}h ${mins}m`;
+            })()}</span>
+          </div>
+        </div>
+      )}
+
       {isSandbox ? (
         <div style={{ textAlign:'center', padding:'2rem 1rem' }}>
           <p style={{ fontSize:'0.85rem', color:'var(--muted)', marginBottom:'0.5rem' }}>🔒 Leaderboard requires Supabase authentication</p>
@@ -224,9 +253,14 @@ const Leaderboard: React.FC<Props> = ({
                     {rank===1 ? '👑' : rank===2 ? '🥈' : rank===3 ? '🥉' : rank}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:'0.82rem', fontWeight:600, color:'var(--text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                      {formatStudentName(s.name, s.college)}
-                      {s.isCurrentUser && <span style={{ marginLeft:'0.4rem', fontSize:'0.65rem', color:'var(--gold2)', fontWeight:700 }}>YOU</span>}
+                    <div style={{ fontSize:'0.82rem', fontWeight:600, color:'var(--text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatStudentName(s.name, s.college)}</span>
+                      {rank === 1 && (
+                        <span className="badge badge-gold" style={{ fontSize: '0.58rem', padding: '0.1rem 0.35rem', flexShrink: 0 }}>
+                          ⚡ First Blood
+                        </span>
+                      )}
+                      {s.isCurrentUser && <span style={{ marginLeft:'0.2rem', fontSize:'0.65rem', color:'var(--gold2)', fontWeight:700, flexShrink: 0 }}>YOU</span>}
                     </div>
                   </div>
                   <span className={`badge ${s.level==='pro'?'badge-gold':s.level==='mid'?'badge-blue':'badge-green'}`} style={{ fontSize:'0.62rem' }}>
@@ -242,15 +276,20 @@ const Leaderboard: React.FC<Props> = ({
             // 🏢 Render Colleges
             collegeScores.slice(0, visibleCount).map((c, idx) => {
               const rank = idx + 1;
+              const leagueLabel = rank <= 3 ? '👑 Premier League' : rank <= 8 ? '🥈 Division 1' : '🥉 Division 2';
+              const leagueBadgeClass = rank <= 3 ? 'badge-gold' : rank <= 8 ? 'badge-blue' : 'badge-amber';
               return (
                 <div key={c.college} className={`lb-row${c.isCurrentUserCollege ? ' me' : ''}`}>
                   <div className={`lb-rank ${rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-n'}`}>
                     {rank===1 ? '👑' : rank===2 ? '🥈' : rank===3 ? '🥉' : rank}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:'0.82rem', fontWeight:600, color:'var(--text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                      🏢 {c.college}
-                      {c.isCurrentUserCollege && <span style={{ marginLeft:'0.4rem', fontSize:'0.65rem', color:'var(--gold2)' , fontWeight:700 }}>YOUR COLLEGE</span>}
+                    <div style={{ fontSize:'0.82rem', fontWeight:600, color:'var(--text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span>🏢 {c.college}</span>
+                      <span className={`badge ${leagueBadgeClass}`} style={{ fontSize: '0.58rem', padding: '0.1rem 0.35rem', flexShrink: 0 }}>
+                        {leagueLabel}
+                      </span>
+                      {c.isCurrentUserCollege && <span style={{ marginLeft:'0.2rem', fontSize:'0.65rem', color:'var(--gold2)', fontWeight:700, flexShrink: 0 }}>YOUR COLLEGE</span>}
                     </div>
                     <div style={{ fontSize:'0.68rem', color:'var(--muted)', display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <span>👥 {c.studentCount} student{c.studentCount > 1 ? 's' : ''}</span>

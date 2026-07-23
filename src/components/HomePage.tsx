@@ -101,6 +101,10 @@ const HomePage: React.FC = () => {
   const [tempCollege,  setTempCollege]  = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
+  // Daily Streaks & Gamification State
+  const [streakCount, setStreakCount] = useState(0);
+  const [streakShields, setStreakShields] = useState(0);
+
   let activeTab: TabKey = 'practice';
   if (currentPath === '/mnc') activeTab = 'mnc';
   else if (currentPath === '/certificates') activeTab = 'certificates';
@@ -235,6 +239,38 @@ const HomePage: React.FC = () => {
 
       // Load local gamification badges fallback
       setBadges(JSON.parse(localStorage.getItem(`codcraft_badges_${uid}`) || '[]'));
+
+      // Load streak data
+      const rawStreak = localStorage.getItem(`codcraft_streak_${uid}`);
+      if (rawStreak) {
+        try {
+          const parsed = JSON.parse(rawStreak);
+          const todayStr = new Date().toISOString().split('T')[0];
+          const lastDate = parsed.lastDate;
+          if (lastDate) {
+            const diffDays = Math.floor((new Date(todayStr).getTime() - new Date(lastDate).getTime()) / (1000 * 3600 * 24));
+            if (diffDays > 1) {
+              if (parsed.shields > 0 && diffDays === 2) {
+                parsed.shields -= 1;
+                parsed.lastDate = todayStr;
+                localStorage.setItem(`codcraft_streak_${uid}`, JSON.stringify(parsed));
+              } else {
+                parsed.count = 0;
+                localStorage.setItem(`codcraft_streak_${uid}`, JSON.stringify(parsed));
+              }
+            }
+          }
+          setStreakCount(parsed.count || 0);
+          setStreakShields(parsed.shields || 0);
+        } catch (e) {
+          setStreakCount(0);
+          setStreakShields(0);
+        }
+      } else {
+        setStreakCount(0);
+        setStreakShields(0);
+      }
+
       setIsSandbox(false);
       setDbError(null);
 
@@ -360,6 +396,41 @@ const HomePage: React.FC = () => {
         if (questionId && !solvedQs.includes(questionId)) {
           solvedQs.push(questionId);
         }
+
+        // Daily Streak calculation
+        const todayStr = new Date().toISOString().split('T')[0];
+        const rawStreak = localStorage.getItem(`codcraft_streak_${user.id}`);
+        let streakObj = { count: 0, lastDate: '', shields: 0 };
+        if (rawStreak) {
+          try { streakObj = JSON.parse(rawStreak); } catch(e){}
+        }
+
+        if (streakObj.lastDate !== todayStr) {
+          const lastDate = streakObj.lastDate;
+          if (lastDate) {
+            const diffDays = Math.floor((new Date(todayStr).getTime() - new Date(lastDate).getTime()) / (1000 * 3600 * 24));
+            if (diffDays === 1) {
+              streakObj.count += 1;
+            } else if (diffDays === 2 && streakObj.shields > 0) {
+              streakObj.shields -= 1;
+              streakObj.count += 1;
+            } else {
+              streakObj.count = 1;
+            }
+          } else {
+            streakObj.count = 1;
+          }
+          streakObj.lastDate = todayStr;
+        }
+
+        // Award 1 streak shield for every 5 questions solved (max 3 shields)
+        if (nextSolved % 5 === 0 && (streakObj.shields || 0) < 3) {
+          streakObj.shields = (streakObj.shields || 0) + 1;
+        }
+
+        localStorage.setItem(`codcraft_streak_${user.id}`, JSON.stringify(streakObj));
+        setStreakCount(streakObj.count);
+        setStreakShields(streakObj.shields);
       } else if (reward < 0) {
         nextWrong = currentWrong + 1;
       }
@@ -597,6 +668,21 @@ const HomePage: React.FC = () => {
         </nav>
 
         <div className="app-header-right">
+          {/* Daily Streak Chip — desktop */}
+          <div 
+            className="streak-chip desktop-only" 
+            style={{ background: 'var(--gold-bg)', borderColor: '#fde68a', color: 'var(--gold2)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+            title={`${streakCount >= 7 ? '1.5x' : streakCount >= 3 ? '1.2x' : '1.0x'} XP Multiplier Active!`}
+          >
+            <span>🔥</span>
+            <span><strong>{streakCount}</strong> {streakCount === 1 ? 'Day' : 'Days'}</span>
+            {streakShields > 0 && (
+              <span style={{ marginLeft: '0.15rem', background: 'var(--indigo-bg)', color: 'var(--indigo)', padding: '0.05rem 0.35rem', borderRadius: '10px', fontSize: '0.62rem', fontWeight: 800 }}>
+                🛡️ {streakShields}
+              </span>
+            )}
+          </div>
+
           {/* Level & XP chip — desktop */}
           <div className="streak-chip desktop-only" style={{ background: 'var(--indigo-bg)', borderColor: '#c7d2fe', color: 'var(--indigo)' }}>
             <span>⚡</span>
@@ -861,6 +947,10 @@ const HomePage: React.FC = () => {
               <div className="drawer-stats-row">
                 <span>⚡</span>
                 <span><strong>{xp}</strong> total XP earned</span>
+              </div>
+              <div className="drawer-stats-row">
+                <span>🔥</span>
+                <span><strong>{streakCount}</strong> Day Streak {streakShields > 0 ? `(🛡️ ${streakShields} Shield)` : ''}</span>
               </div>
               <div className="drawer-stats-row">
                 <span>📈</span>
