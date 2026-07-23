@@ -8,6 +8,8 @@ import QuestionBank from './QuestionBank';
 import MNCSection from './MNCSection';
 import Leaderboard from './Leaderboard';
 import CertificateGenerator from './CertificateGenerator';
+import CampusClashPage from './CampusClashPage';
+import StreakModal from './StreakModal';
 import questionsData from '../data/questions.json';
 import { BADGES } from '../data/badges';
 
@@ -65,6 +67,7 @@ const Icon = {
 
 const navItems = [
   { key: 'practice',     label: 'Practice Arena',  icon: <Icon.Code /> },
+  { key: 'clash',        label: 'Campus Clash',    icon: <Icon.Trophy /> },
   { key: 'mnc',          label: 'MNC Prep',         icon: <Icon.Building /> },
   { key: 'certificates', label: 'My Certificates',  icon: <Icon.Certificate /> },
   { key: 'leaderboard',  label: 'Student Standings', icon: <Icon.Trophy /> },
@@ -104,9 +107,11 @@ const HomePage: React.FC = () => {
   // Daily Streaks & Gamification State
   const [streakCount, setStreakCount] = useState(0);
   const [streakShields, setStreakShields] = useState(0);
+  const [showStreakModal, setShowStreakModal] = useState(false);
 
   let activeTab: TabKey = 'practice';
-  if (currentPath === '/mnc') activeTab = 'mnc';
+  if (currentPath === '/clash') activeTab = 'clash';
+  else if (currentPath === '/mnc') activeTab = 'mnc';
   else if (currentPath === '/certificates') activeTab = 'certificates';
   else if (currentPath === '/leaderboard') activeTab = 'leaderboard';
   else if (currentPath === '/colleges') activeTab = 'colleges';
@@ -637,6 +642,7 @@ const HomePage: React.FC = () => {
   const navigate = (tab: TabKey) => {
     setIsMenuOpen(false);
     if (tab === 'practice') navigateRouter('/');
+    else if (tab === 'clash') navigateRouter('/clash');
     else if (tab === 'mnc') navigateRouter('/mnc');
     else if (tab === 'certificates') navigateRouter('/certificates');
     else if (tab === 'leaderboard') navigateRouter('/leaderboard');
@@ -671,8 +677,9 @@ const HomePage: React.FC = () => {
           {/* Daily Streak Chip — desktop */}
           <div 
             className="streak-chip desktop-only" 
-            style={{ background: 'var(--gold-bg)', borderColor: '#fde68a', color: 'var(--gold2)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-            title={`${streakCount >= 7 ? '1.5x' : streakCount >= 3 ? '1.2x' : '1.0x'} XP Multiplier Active!`}
+            onClick={() => setShowStreakModal(true)}
+            style={{ background: 'var(--gold-bg)', borderColor: '#fde68a', color: 'var(--gold2)', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}
+            title="Click to view streak breakdown and shields!"
           >
             <span>🔥</span>
             <span><strong>{streakCount}</strong> {streakCount === 1 ? 'Day' : 'Days'}</span>
@@ -865,6 +872,8 @@ const HomePage: React.FC = () => {
             {renderBadgeShelf()}
           </div>
         </div>
+      ) : activeTab === 'clash' ? (
+        <CampusClashPage xp={xp} fullName={fullName} college={college} />
       ) : activeTab === 'mnc' ? (
         <div className="dashboard-layout">
           {/* MNC Prep Content */}
@@ -1020,6 +1029,14 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* ── Streak Tracker Modal ─────────────────────────────── */}
+      <StreakModal 
+        isOpen={showStreakModal}
+        onClose={() => setShowStreakModal(false)}
+        streakCount={streakCount}
+        streakShields={streakShields}
+      />
 
       {renderProfileModal()}
     </div>
