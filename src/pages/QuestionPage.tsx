@@ -114,10 +114,11 @@ const QuestionPage: React.FC = () => {
   const [mobileTab,    setMobileTab]    = useState<'problem' | 'editor'>('problem');
   const [panelOpen,    setPanelOpen]    = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const editorRef = useRef<any>(null);
 
   // ── Load question & restore saved code ───────────────────
   useEffect(() => {
-    if (!question || !user) return;
+    if (!question) return;
     setSolved(false);
     setExecMsg(null);
     setOutputs(question.testCases.map(tc => ({ status: 'idle', expected: tc.output })));
@@ -126,49 +127,55 @@ const QuestionPage: React.FC = () => {
 
     const loadSavedCode = async () => {
       let dbCode: string | null = null;
-      try {
-        const { data } = await supabase.from('student_progress').select('solved_questions').eq('email', user.email).single();
-        const solvedList = data?.solved_questions || [];
-        const match = solvedList.find((item: any) => item && typeof item === 'object' && item.id === question.id && item.lang === language);
-        if (match && typeof match === 'object') {
-          dbCode = match.code;
+      if (user) {
+        try {
+          const { data } = await supabase.from('student_progress').select('solved_questions').eq('email', user.email).single();
+          const solvedList = data?.solved_questions || [];
+          const match = solvedList.find((item: any) => item && typeof item === 'object' && item.id === question.id && item.lang === language);
+          if (match && typeof match === 'object') {
+            dbCode = match.code;
+          }
+        } catch (err) {
+          console.warn("Could not load code from Supabase:", err);
         }
-      } catch (err) {
-        console.warn("Could not load code from Supabase:", err);
       }
 
-      const savedKey = `codcraft_code_${user.id}_${question.id}_${language}`;
+      const userIdKey = user?.id || 'guest';
+      const savedKey = `codcraft_code_${userIdKey}_${question.id}_${language}`;
       const saved = localStorage.getItem(savedKey);
       setCode(dbCode ?? saved ?? (question.templates?.[language] || ''));
     };
     loadSavedCode();
 
-    if (localStorage.getItem(`codcraft_solved_${user.id}_${question.id}`) === 'true') {
-      setSolved(true);
-    } else {
-      const checkSolvedStatus = async () => {
-        try {
-          const { data } = await supabase.from('student_progress').select('solved_questions').eq('email', user.email).single();
-          const solvedList = data?.solved_questions || [];
-          const isSolvedDb = solvedList.some((item: any) => {
-            if (typeof item === 'number') return item === question.id;
-            if (item && typeof item === 'object') return item.id === question.id;
-            return false;
-          });
-          if (isSolvedDb) {
-            setSolved(true);
-            localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
-          }
-        } catch {}
-      };
-      checkSolvedStatus();
+    if (user) {
+      if (localStorage.getItem(`codcraft_solved_${user.id}_${question.id}`) === 'true') {
+        setSolved(true);
+      } else {
+        const checkSolvedStatus = async () => {
+          try {
+            const { data } = await supabase.from('student_progress').select('solved_questions').eq('email', user.email).single();
+            const solvedList = data?.solved_questions || [];
+            const isSolvedDb = solvedList.some((item: any) => {
+              if (typeof item === 'number') return item === question.id;
+              if (item && typeof item === 'object') return item.id === question.id;
+              return false;
+            });
+            if (isSolvedDb) {
+              setSolved(true);
+              localStorage.setItem(`codcraft_solved_${user.id}_${question.id}`, 'true');
+            }
+          } catch {}
+        };
+        checkSolvedStatus();
+      }
     }
   }, [question?.id, language, user?.id]);
 
   // ── Persist code (debounced 800ms) ───────────────────────
   useEffect(() => {
-    if (!question || !user || !code) return;
-    const key = `codcraft_code_${user.id}_${question.id}_${language}`;
+    if (!question || !code) return;
+    const userIdKey = user?.id || 'guest';
+    const key = `codcraft_code_${userIdKey}_${question.id}_${language}`;
     const t = setTimeout(() => localStorage.setItem(key, code), 800);
     return () => clearTimeout(t);
   }, [code, question?.id, language, user?.id]);
@@ -474,25 +481,20 @@ const QuestionPage: React.FC = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Mobile action buttons */}
-              <div className="qp-mobile-actions">
-                <button onClick={runCode} disabled={isRunning || timeLeft <= 0} className="btn btn-outline" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                  <PlayIcon /> {isRunning ? 'Running…' : 'Run Code'}
-                </button>
-                <button onClick={submitSolution} disabled={isRunning || isSubmitting || solved || !allPass || timeLeft <= 0}
-                  className={`btn ${solved ? 'btn-outline' : allPass ? 'btn-primary' : 'btn-outline'}`}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', opacity: (solved || (!allPass && !solved)) ? 0.6 : 1 }}>
-                  <CheckIcon /> {isSubmitting ? 'Submitting…' : solved ? 'Solved! ✓' : `Submit (${xpLabel})`}
-                </button>
-              </div>
             </div>
           )}
         </div>
 
         {/* ── Right: Monaco Editor ─────────────────────────── */}
-        <div className={`qp-editor-panel${mobileTab === 'problem' ? ' qp-hide-mobile' : ' qp-show-mobile'}`}
-          style={{ position: 'relative' }}>
+        <div 
+          className={`qp-editor-panel${mobileTab === 'problem' ? ' qp-hide-mobile' : ' qp-show-mobile'}`}
+          style={{ position: 'relative', cursor: 'text' }}
+          onClick={() => {
+            if (editorRef.current) {
+              editorRef.current.focus();
+            }
+          }}
+        >
 
           {/* Timer expired overlay */}
           {timeLeft <= 0 && !solved && (
@@ -513,6 +515,12 @@ const QuestionPage: React.FC = () => {
             theme="vs-dark"
             value={code}
             onChange={v => setCode(v || '')}
+            onMount={(editor) => {
+              editorRef.current = editor;
+              setTimeout(() => {
+                editor.layout();
+              }, 100);
+            }}
             options={{
               minimap: { enabled: window.innerWidth > 1024 },
               fontSize: window.innerWidth < 768 ? 16 : 14,
@@ -521,7 +529,7 @@ const QuestionPage: React.FC = () => {
               automaticLayout: true,
               tabSize: 4,
               padding: { top: 20, bottom: 20 },
-              readOnly: (timeLeft <= 0 && !solved),
+              readOnly: (timeLeft <= 0),
               wordWrap: 'on',
               lineNumbersMinChars: 3,
               scrollBeyondLastLine: false,

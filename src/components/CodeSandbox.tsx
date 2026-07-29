@@ -1,5 +1,5 @@
 // src/components/CodeSandbox.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { useAuth } from './AuthProvider';
 import { Play, CheckCircle, AlertCircle, HelpCircle, Timer, RotateCcw } from 'lucide-react';
@@ -43,6 +43,7 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [solved, setSolved] = useState(false);
   const [executionMessage, setExecutionMessage] = useState<string | null>(null);
+  const editorRef = useRef<any>(null);
 
   // Timer states
   const [timeLeft, setTimeLeft] = useState<number>(900); // 15 mins default
@@ -395,7 +396,14 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
         </div>
 
         {/* Monaco Editor */}
-        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+        <div 
+          style={{ flex: 1, overflow: 'hidden', position: 'relative', cursor: 'text' }}
+          onClick={() => {
+            if (editorRef.current) {
+              editorRef.current.focus();
+            }
+          }}
+        >
           <Editor
             height="100%"
             language={language === 'cpp' || language === 'c' ? 'cpp' : language}
@@ -407,6 +415,12 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
               const draftKey = `codcraft_draft_${user?.id || 'guest'}_${question.id}_${language}`;
               localStorage.setItem(draftKey, val);
             }}
+            onMount={(editor) => {
+              editorRef.current = editor;
+              setTimeout(() => {
+                editor.layout();
+              }, 100);
+            }}
             options={{
               minimap: { enabled: false },
               fontSize: 13,
@@ -414,7 +428,7 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
               automaticLayout: true,
               tabSize: 4,
               padding: { top: 12 },
-              readOnly: timeLeft <= 0 || solved,
+              readOnly: timeLeft <= 0,
               wordWrap: 'on',
               lineNumbersMinChars: 3
             }}
