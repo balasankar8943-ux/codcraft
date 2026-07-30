@@ -12,6 +12,8 @@ import CertificatesPage from './pages/CertificatesPage';
 import QuestionPage     from './pages/QuestionPage';
 import AdminNotificationsPage from './pages/AdminNotificationsPage';
 
+import CompilerPage     from './pages/CompilerPage';
+
 const App: React.FC = () => {
   const { user, loading } = useAuth();
 
@@ -40,7 +42,7 @@ const App: React.FC = () => {
       <Route path="/question/:id" element={<Guard><QuestionPage /></Guard>} />
 
       {/* Section pages */}
-      <Route path="/compiler"     element={<Guard><PracticePage /></Guard>} />
+      <Route path="/compiler"     element={<Guard><CompilerPage /></Guard>} />
       <Route path="/clash"        element={<Guard><PracticePage /></Guard>} />
       <Route path="/colleges"     element={<Guard><PracticePage /></Guard>} />
       <Route path="/mnc"          element={<Guard><MNCPage /></Guard>} />
