@@ -10,6 +10,7 @@ import Leaderboard from './Leaderboard';
 import CertificateGenerator from './CertificateGenerator';
 import CampusClashPage from './CampusClashPage';
 import StreakModal from './StreakModal';
+import FreeCompilerPage from './FreeCompilerPage';
 import questionsData from '../data/questions.json';
 import { BADGES } from '../data/badges';
 
@@ -67,6 +68,7 @@ const Icon = {
 
 const navItems = [
   { key: 'practice',     label: 'Practice Arena',  icon: <Icon.Code /> },
+  { key: 'compiler',     label: 'Free Compiler',   icon: <Icon.Code /> },
   { key: 'clash',        label: 'Campus Clash',    icon: <Icon.Trophy /> },
   { key: 'mnc',          label: 'MNC Prep',         icon: <Icon.Building /> },
   { key: 'certificates', label: 'My Certificates',  icon: <Icon.Certificate /> },
@@ -110,7 +112,8 @@ const HomePage: React.FC = () => {
   const [showStreakModal, setShowStreakModal] = useState(false);
 
   let activeTab: TabKey = 'practice';
-  if (currentPath === '/clash') activeTab = 'clash';
+  if (currentPath === '/compiler') activeTab = 'compiler';
+  else if (currentPath === '/clash') activeTab = 'clash';
   else if (currentPath === '/mnc') activeTab = 'mnc';
   else if (currentPath === '/certificates') activeTab = 'certificates';
   else if (currentPath === '/leaderboard') activeTab = 'leaderboard';
@@ -642,6 +645,7 @@ const HomePage: React.FC = () => {
   const navigate = (tab: TabKey) => {
     setIsMenuOpen(false);
     if (tab === 'practice') navigateRouter('/');
+    else if (tab === 'compiler') navigateRouter('/compiler');
     else if (tab === 'clash') navigateRouter('/clash');
     else if (tab === 'mnc') navigateRouter('/mnc');
     else if (tab === 'certificates') navigateRouter('/certificates');
@@ -872,6 +876,8 @@ const HomePage: React.FC = () => {
             {renderBadgeShelf()}
           </div>
         </div>
+      ) : activeTab === 'compiler' ? (
+        <FreeCompilerPage />
       ) : activeTab === 'clash' ? (
         <CampusClashPage xp={xp} fullName={fullName} college={college} />
       ) : activeTab === 'mnc' ? (

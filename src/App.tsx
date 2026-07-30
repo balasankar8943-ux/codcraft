@@ -40,6 +40,9 @@ const App: React.FC = () => {
       <Route path="/question/:id" element={<Guard><QuestionPage /></Guard>} />
 
       {/* Section pages */}
+      <Route path="/compiler"     element={<Guard><PracticePage /></Guard>} />
+      <Route path="/clash"        element={<Guard><PracticePage /></Guard>} />
+      <Route path="/colleges"     element={<Guard><PracticePage /></Guard>} />
       <Route path="/mnc"          element={<Guard><MNCPage /></Guard>} />
       <Route path="/leaderboard"  element={<Guard><LeaderboardPage /></Guard>} />
       <Route path="/certificates" element={<Guard><CertificatesPage /></Guard>} />

@@ -188,35 +188,6 @@ const Leaderboard: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Weekly League Sprint Banner for Colleges */}
-      {viewMode === 'colleges' && (
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(245,158,11,0.08) 100%)',
-          border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
-          padding: '0.65rem 0.85rem', fontSize: '0.75rem', color: 'var(--text2)', flexWrap: 'wrap', gap: '0.4rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700 }}>
-            <span>⚔️ <strong>KTU Campus Clash League</strong></span>
-            <span className="badge badge-gold" style={{ fontSize: '0.6rem' }}>Weekly Sprint</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontFamily: 'var(--mono)', fontSize: '0.72rem', color: 'var(--indigo)', fontWeight: 700 }}>
-            <span>⏱️ Sprint Ends:</span>
-            <span>{(() => {
-              const now = new Date();
-              const day = now.getDay();
-              const diff = (7 - day + 1) % 7 || 7;
-              const nextMonday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff, 0, 0, 0);
-              const totalSecs = Math.max(0, Math.floor((nextMonday.getTime() - now.getTime()) / 1000));
-              const days = Math.floor(totalSecs / (3600 * 24));
-              const hours = Math.floor((totalSecs % (3600 * 24)) / 3600);
-              const mins = Math.floor((totalSecs % 3600) / 60);
-              return `${days}d ${hours}h ${mins}m`;
-            })()}</span>
-          </div>
-        </div>
-      )}
-
       {isSandbox ? (
         <div style={{ textAlign:'center', padding:'2rem 1rem' }}>
           <p style={{ fontSize:'0.85rem', color:'var(--muted)', marginBottom:'0.5rem' }}>🔒 Leaderboard requires Supabase authentication</p>
