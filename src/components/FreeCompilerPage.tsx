@@ -5,7 +5,7 @@ import {
   Play, Terminal, Code2, AlertCircle, Save, Folder, FolderPlus,
   FilePlus, Trash2, Edit3, ChevronRight, ChevronDown, FileCode, X, Loader2, Download,
   Copy, CheckCircle2, CornerDownLeft, Maximize2, Minimize2, HelpCircle,
-  Scissors, ClipboardPaste
+  Scissors, ClipboardPaste, Send, RotateCcw
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import AIHintAssistant from './AIHintAssistant';
@@ -22,10 +22,10 @@ const LANGUAGE_IDS: Record<string, number> = {
 };
 
 const DEFAULT_TEMPLATES: Record<string, string> = {
-  python: `# Free Python 3 Playground\ndef main():\n    name = "Student"\n    print(f"Hello, {name}! Welcome to CodCraft Cloud IDE.")\n    numbers = [5, 2, 9, 1, 7]\n    numbers.sort()\n    print("Sorted numbers:", numbers)\n\nif __name__ == "__main__":\n    main()\n`,
-  cpp: `// Free C++ Playground\n#include <iostream>\n#include <vector>\n#include <algorithm>\n\nusing namespace std;\n\nint main() {\n    cout << "Hello from CodCraft C++ Compiler!" << endl;\n    vector<int> nums = {5, 2, 9, 1, 7};\n    sort(nums.begin(), nums.end());\n    cout << "Sorted vector: ";\n    for (int n : nums) cout << n << " ";\n    cout << endl;\n    return 0;\n}\n`,
-  c: `/* Free C Playground */\n#include <stdio.h>\n\nint main() {\n    printf("Hello from CodCraft C Compiler!\\n");\n    int a = 10, b = 25;\n    printf("Sum of %d and %d is %d\\n", a, b, a + b);\n    return 0;\n}\n`,
-  java: `// Free Java Playground\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from CodCraft Java Compiler!");\n        List<Integer> list = Arrays.asList(5, 2, 9, 1, 7);\n        Collections.sort(list);\n        System.out.println("Sorted list: " + list);\n    }\n}\n`
+  python: `# Free Interactive Python Playground\ndef main():\n    print("=== INTERACTIVE CALCULATOR ===")\n    op = input("Choose operation (1. Add, 2. Subtract, 3. Multiply): ")\n    num1 = float(input("Enter first number: "))\n    num2 = float(input("Enter second number: "))\n    \n    if op == '1':\n        print(f"Result: {num1} + {num2} = {num1 + num2}")\n    elif op == '2':\n        print(f"Result: {num1} - {num2} = {num1 - num2}")\n    elif op == '3':\n        print(f"Result: {num1} * {num2} = {num1 * num2}")\n    else:\n        print("Invalid operation selected.")\n\nif __name__ == "__main__":\n    main()\n`,
+  cpp: `// Free Interactive C++ Playground\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "=== C++ INTERACTIVE CALCULATOR ===" << endl;\n    int choice;\n    cout << "Select operation (1. Add, 2. Multiply): ";\n    cin >> choice;\n    \n    double a, b;\n    cout << "Enter first number: ";\n    cin >> a;\n    cout << "Enter second number: ";\n    cin >> b;\n    \n    if (choice == 1) cout << "Result: " << a + b << endl;\n    else cout << "Result: " << a * b << endl;\n    return 0;\n}\n`,
+  c: `/* Free Interactive C Playground */\n#include <stdio.h>\n\nint main() {\n    printf("=== C INTERACTIVE PROGRAM ===\\n");\n    int a, b;\n    printf("Enter first integer: ");\n    scanf("%d", &a);\n    printf("Enter second integer: ");\n    scanf("%d", &b);\n    printf("Sum: %d + %d = %d\\n", a, b, a + b);\n    return 0;\n}\n`,
+  java: `// Free Interactive Java Playground\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.println("=== JAVA INTERACTIVE PROGRAM ===");\n        System.out.print("Enter your name: ");\n        String name = sc.nextLine();\n        System.out.print("Enter your age: ");\n        int age = sc.nextInt();\n        System.out.println("Hello " + name + "! Next year you will be " + (age + 1) + " years old.");\n    }\n}\n`
 };
 
 const FreeCompilerPage: React.FC = () => {
@@ -61,7 +61,7 @@ const FreeCompilerPage: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'dirty'>('saved');
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
-  // Execution states
+  // Execution & Real-Time Interactive Terminal states
   const [stdin, setStdin] = useState<string>('');
   const [stdout, setStdout] = useState<string>('');
   const [stderr, setStderr] = useState<string>('');
@@ -70,8 +70,15 @@ const FreeCompilerPage: React.FC = () => {
   const [consoleTab, setConsoleTab] = useState<'stdout' | 'stdin' | 'stderr'>('stdout');
   const [copied, setCopied] = useState<boolean>(false);
   const [isConsoleMaximized, setIsConsoleMaximized] = useState<boolean>(false);
+
+  // Interactive Execution Queue states
+  const [interactiveQueue, setInteractiveQueue] = useState<string[]>([]);
+  const [liveInputVal, setLiveInputVal] = useState<string>('');
+  const [isWaitingForInput, setIsWaitingForInput] = useState<boolean>(false);
+
   const editorRef = useRef<any>(null);
   const nativeTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const terminalBottomRef = useRef<HTMLDivElement>(null);
 
   // Track window resizing
   useEffect(() => {
@@ -126,6 +133,11 @@ const FreeCompilerPage: React.FC = () => {
 
     return () => clearTimeout(timer);
   }, [code, activeFileId, language, userId]);
+
+  // Auto-scroll terminal to bottom when stdout updates
+  useEffect(() => {
+    terminalBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [stdout, stderr, isWaitingForInput]);
 
   // Manual save trigger
   const handleManualSave = async () => {
@@ -219,7 +231,7 @@ const FreeCompilerPage: React.FC = () => {
         setCode(prev => prev + text);
       }
     } catch (e) {
-      alert("Clipboard access permission denied. Please press Ctrl+V (or Cmd+V) to paste directly into the editor.");
+      alert("Clipboard access permission denied by browser. Please press Ctrl+V (or Cmd+V) to paste directly into the editor.");
     }
   };
 
@@ -312,13 +324,10 @@ const FreeCompilerPage: React.FC = () => {
     }
   };
 
-  // Run Code via Judge0 API
-  const handleRunCode = async () => {
+  // Run Code via Judge0 API with Interactive Session support
+  const executeCodeWithInputs = async (inputsList: string[]) => {
     if (!code) return;
     setIsRunning(true);
-    setStdout('');
-    setStderr('');
-    setExecTime(null);
     setConsoleTab('stdout');
     if (isMobile) setMobileTab('console');
     const startTime = performance.now();
@@ -328,7 +337,11 @@ const FreeCompilerPage: React.FC = () => {
       const langId = LANGUAGE_IDS[language] || 71;
       let resOutput = { stdout: '', stderr: '' };
 
-      const body = JSON.stringify({ source_code: code, language_id: langId, stdin: stdin });
+      const inputBuffer = inputsList.length > 0
+        ? inputsList.join('\n') + '\n'
+        : (stdin ? stdin : '');
+
+      const body = JSON.stringify({ source_code: code, language_id: langId, stdin: inputBuffer });
 
       if (apiKey) {
         const response = await fetch('https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true', {
@@ -365,10 +378,21 @@ const FreeCompilerPage: React.FC = () => {
 
       const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
       setExecTime(`${elapsed}s`);
-      setStdout(resOutput.stdout || (resOutput.stderr ? '' : '(Program executed cleanly with no output)'));
-      setStderr(resOutput.stderr || '');
+      
+      const outText = resOutput.stdout || (resOutput.stderr ? '' : '(Program executed cleanly with no output)');
+      const errText = resOutput.stderr || '';
+      
+      setStdout(outText);
+      setStderr(errText);
 
-      if (resOutput.stderr && !resOutput.stdout) {
+      // Detect if program requires interactive user input (e.g. EOFError, input prompt ending without newline, or stdin exhaustion)
+      const needsInput = errText.includes('EOFError') || 
+                         errText.includes('NoSuchElementException') || 
+                         (outText && !outText.endsWith('\n') && !errText);
+
+      setIsWaitingForInput(Boolean(needsInput));
+
+      if (errText && !outText) {
         setConsoleTab('stderr');
       }
     } catch (err: any) {
@@ -377,6 +401,27 @@ const FreeCompilerPage: React.FC = () => {
     } finally {
       setIsRunning(false);
     }
+  };
+
+  // Trigger initial Run
+  const handleRunCode = () => {
+    setInteractiveQueue([]);
+    setLiveInputVal('');
+    executeCodeWithInputs([]);
+  };
+
+  // User submits a live input response directly inside the Interactive Terminal
+  const handleSendLiveTerminalInput = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (liveInputVal === '' && !isWaitingForInput) return;
+
+    const updatedQueue = [...interactiveQueue, liveInputVal];
+    setInteractiveQueue(updatedQueue);
+    setLiveInputVal('');
+    setIsWaitingForInput(false);
+
+    // Re-execute program with updated input queue
+    executeCodeWithInputs(updatedQueue);
   };
 
   // Copy stdout content to clipboard
@@ -505,7 +550,7 @@ const FreeCompilerPage: React.FC = () => {
               </button>
             </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--muted)', margin: 0 }}>
-              Create folders & files, save to database, compile code, and download files directly to your device!
+              Create folders & files, save to database, compile code, and run interactive programs in real-time!
             </p>
           </div>
         </div>
@@ -733,8 +778,78 @@ const FreeCompilerPage: React.FC = () => {
                   theme="vs-dark"
                   value={code}
                   onChange={v => setCode(v || '')}
-                  onMount={editor => {
+                  onMount={(editor, monaco) => {
                     editorRef.current = editor;
+
+                    // Override Monaco Right-Click Context Menu Cut Action
+                    editor.addAction({
+                      id: 'monaco-context-cut',
+                      label: 'Cut (Clipboard API)',
+                      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyX],
+                      contextMenuGroupId: '9_cutcopypaste',
+                      contextMenuOrder: 1,
+                      run: async (ed: any) => {
+                        try {
+                          const selection = ed.getSelection();
+                          const selectedText = ed.getModel().getValueInRange(selection);
+                          const textToCut = selectedText || ed.getValue();
+
+                          await navigator.clipboard.writeText(textToCut);
+                          if (selection && !selection.isEmpty()) {
+                            ed.executeEdits('cut', [{ range: selection, text: '' }]);
+                          } else {
+                            ed.setValue('');
+                          }
+                        } catch (e) {
+                          document.execCommand('cut');
+                        }
+                      }
+                    });
+
+                    // Override Monaco Right-Click Context Menu Copy Action
+                    editor.addAction({
+                      id: 'monaco-context-copy',
+                      label: 'Copy (Clipboard API)',
+                      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyC],
+                      contextMenuGroupId: '9_cutcopypaste',
+                      contextMenuOrder: 2,
+                      run: async (ed: any) => {
+                        try {
+                          const selection = ed.getSelection();
+                          const selectedText = ed.getModel().getValueInRange(selection);
+                          const textToCopy = selectedText || ed.getValue();
+
+                          await navigator.clipboard.writeText(textToCopy);
+                        } catch (e) {
+                          document.execCommand('copy');
+                        }
+                      }
+                    });
+
+                    // Override Monaco Right-Click Context Menu Paste Action
+                    editor.addAction({
+                      id: 'monaco-context-paste',
+                      label: 'Paste (Clipboard API)',
+                      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV],
+                      contextMenuGroupId: '9_cutcopypaste',
+                      contextMenuOrder: 3,
+                      run: async (ed: any) => {
+                        try {
+                          const text = await navigator.clipboard.readText();
+                          if (text) {
+                            const selection = ed.getSelection();
+                            if (selection) {
+                              ed.executeEdits('paste', [{ range: selection, text }]);
+                            } else {
+                              ed.setValue(ed.getValue() + text);
+                            }
+                          }
+                        } catch (e) {
+                          alert("Browser blocked clipboard read permission. Press Ctrl+V (or Cmd+V) to paste directly into editor!");
+                        }
+                      }
+                    });
+
                     setTimeout(() => {
                       try { editor.layout(); editor.focus(); } catch (e) {}
                     }, 100);
@@ -764,7 +879,7 @@ const FreeCompilerPage: React.FC = () => {
           </div>
         )}
 
-        {/* ── Right Column: Clear & Dedicated Output Console Section ────────────── */}
+        {/* ── Right Column: Clear & Dedicated Interactive Output Terminal Section ────────────── */}
         {(!isMobile || mobileTab === 'console' || isConsoleMaximized) && (
           <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.3)', minHeight: '380px' }}>
             
@@ -773,13 +888,17 @@ const FreeCompilerPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Terminal size={16} style={{ color: '#38bdf8' }} />
                 <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#f4f4f5', letterSpacing: '0.04em' }}>
-                  OUTPUT CONSOLE
+                  INTERACTIVE TERMINAL
                 </span>
                 
                 {/* Execution Status Badge */}
                 {isRunning ? (
                   <span style={{ fontSize: '0.68rem', background: '#f59e0b22', color: '#f59e0b', border: '1px solid #f59e0b55', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                    <Loader2 size={10} className="animate-spin" /> Executing…
+                    <Loader2 size={10} className="animate-spin" /> Running…
+                  </span>
+                ) : isWaitingForInput ? (
+                  <span style={{ fontSize: '0.68rem', background: '#6366f122', color: '#818cf8', border: '1px solid #6366f155', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    ⌨️ Waiting for Input
                   </span>
                 ) : stderr ? (
                   <span style={{ fontSize: '0.68rem', background: '#ef444422', color: '#ef4444', border: '1px solid #ef444455', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700 }}>
@@ -787,7 +906,7 @@ const FreeCompilerPage: React.FC = () => {
                   </span>
                 ) : stdout ? (
                   <span style={{ fontSize: '0.68rem', background: '#22c55e22', color: '#22c55e', border: '1px solid #22c55e55', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700 }}>
-                    ✓ Clean Output
+                    ✓ Finished
                   </span>
                 ) : (
                   <span style={{ fontSize: '0.68rem', background: '#27272a', color: '#a1a1aa', padding: '0.15rem 0.5rem', borderRadius: '20px' }}>
@@ -805,6 +924,14 @@ const FreeCompilerPage: React.FC = () => {
                 )}
                 
                 <button
+                  title="Reset & Restart Program"
+                  onClick={handleRunCode}
+                  style={{ background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center' }}
+                >
+                  <RotateCcw size={14} />
+                </button>
+
+                <button
                   title="Copy Console Output"
                   onClick={handleCopyConsoleOutput}
                   style={{ background: 'none', border: 'none', color: copied ? '#4ade80' : '#a1a1aa', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.7rem' }}
@@ -814,7 +941,7 @@ const FreeCompilerPage: React.FC = () => {
 
                 <button
                   title="Clear Output Console"
-                  onClick={() => { setStdout(''); setStderr(''); setExecTime(null); }}
+                  onClick={() => { setStdout(''); setStderr(''); setExecTime(null); setInteractiveQueue([]); setIsWaitingForInput(false); }}
                   style={{ background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', padding: '0.2rem' }}
                 >
                   <Trash2 size={14} />
@@ -844,7 +971,7 @@ const FreeCompilerPage: React.FC = () => {
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem'
                 }}
               >
-                <Terminal size={13} /> Output (stdout)
+                <Terminal size={13} /> Interactive Terminal
               </button>
               <button
                 onClick={() => setConsoleTab('stdin')}
@@ -856,7 +983,7 @@ const FreeCompilerPage: React.FC = () => {
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem'
                 }}
               >
-                <CornerDownLeft size={13} /> Input (stdin)
+                <CornerDownLeft size={13} /> Batch Stdin
               </button>
               <button
                 onClick={() => setConsoleTab('stderr')}
@@ -875,28 +1002,49 @@ const FreeCompilerPage: React.FC = () => {
             {/* Console Tab Content Area */}
             <div style={{ flex: 1, padding: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.85rem', overflowY: 'auto' }}>
               
-              {/* stdout view */}
+              {/* Interactive Terminal stdout view */}
               {consoleTab === 'stdout' && (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <pre style={{
-                    flex: 1, minHeight: '220px', padding: '0.85rem', background: '#000000', color: '#38bdf8',
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{
+                    flex: 1, minHeight: '240px', padding: '0.85rem', background: '#000000', color: '#38bdf8',
                     borderRadius: '6px', border: '1px solid #1e293b', fontFamily: '"JetBrains Mono", Consolas, monospace',
-                    fontSize: '0.82rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', overflowY: 'auto'
+                    fontSize: '0.82rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', overflowY: 'auto', display: 'flex', flexDirection: 'column'
                   }}>
-                    {stdout || (isRunning ? '⚡ Executing code on server...' : 'Click "Run Code" in top bar to compile & view terminal output here.')}
-                  </pre>
+                    <span>
+                      {stdout || (isRunning ? '⚡ Executing interactive program...' : 'Click "Run Code" in top bar to start terminal session.')}
+                    </span>
+
+                    {/* Sequential Input Prompts & Real-Time Input Line */}
+                    {(isRunning || isWaitingForInput || interactiveQueue.length > 0) && (
+                      <form onSubmit={handleSendLiveTerminalInput} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', background: '#09090b', padding: '0.4rem 0.6rem', borderRadius: '4px', border: '1px solid #334155' }}>
+                        <span style={{ color: '#818cf8', fontWeight: 700, fontSize: '0.8rem' }}>➜</span>
+                        <input
+                          type="text"
+                          value={liveInputVal}
+                          onChange={e => setLiveInputVal(e.target.value)}
+                          placeholder={isWaitingForInput ? "Type input & press Enter..." : "Enter next input..."}
+                          autoFocus
+                          style={{ flex: 1, background: 'transparent', border: 'none', color: '#f4f4f5', fontFamily: 'inherit', fontSize: '0.82rem', outline: 'none' }}
+                        />
+                        <button type="submit" disabled={isRunning} style={{ background: 'var(--indigo)', color: '#fff', border: 'none', borderRadius: '3px', padding: '0.2rem 0.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.7rem', fontWeight: 700 }}>
+                          <Send size={11} /> Send
+                        </button>
+                      </form>
+                    )}
+                    <div ref={terminalBottomRef} />
+                  </div>
                 </div>
               )}
 
-              {/* stdin view */}
+              {/* Batch stdin view */}
               {consoleTab === 'stdin' && (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <span style={{ fontSize: '0.75rem', color: '#a1a1aa', lineHeight: 1.4 }}>
-                    Enter inputs required by your program (e.g. input values for <code>scanf</code>, <code>cin</code>, or <code>input()</code>):
+                    Pre-fill batch inputs for your program (one per line):
                   </span>
                   <textarea
                     rows={8}
-                    placeholder={`Example input:\n5\n10 20 30 40 50`}
+                    placeholder={`Example inputs:\n1\n10\n20`}
                     value={stdin}
                     onChange={e => setStdin(e.target.value)}
                     style={{ width: '100%', flex: 1, padding: '0.75rem', fontSize: '0.82rem', fontFamily: 'var(--mono)', borderRadius: '6px', border: '1px solid #27272a', background: '#000000', color: '#f4f4f5', outline: 'none', resize: 'vertical' }}
@@ -917,7 +1065,7 @@ const FreeCompilerPage: React.FC = () => {
                     </pre>
                   ) : (
                     <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#71717a', fontSize: '0.8rem' }}>
-                      ✓ No errors or compilation warnings reported!
+                      ✓ No compilation warnings reported!
                     </div>
                   )}
                 </div>
@@ -1005,11 +1153,11 @@ const FreeCompilerPage: React.FC = () => {
               </div>
 
               <div style={{ padding: '0.75rem', background: 'var(--bg3)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <strong>2. ✂️ Cut, Copy & Paste:</strong> Use the editor toolbar buttons (<strong>Cut</strong>, <strong>Copy</strong>, <strong>Paste</strong>) or press <code>Ctrl+C</code> / <code>Ctrl+V</code> / <code>Ctrl+X</code> (Cmd on Mac) to manage your code snippets!
+                <strong>2. ✂️ Cut, Copy & Paste:</strong> Right-click inside the editor or use the top action buttons (<strong>Cut</strong>, <strong>Copy</strong>, <strong>Paste</strong>) or press <code>Ctrl+C</code> / <code>Ctrl+V</code> / <code>Ctrl+X</code> (Cmd on Mac)!
               </div>
 
               <div style={{ padding: '0.75rem', background: 'var(--gold-bg)', borderRadius: '8px', border: '1px solid #fde68a' }}>
-                <strong>3. ⚡ Compile & Run:</strong> Click <strong>Run Code</strong> in the top bar to execute your file in Python, C++, C, or Java. View terminal output in the Output Console.
+                <strong>3. ⌨️ Real-Time Interactive Terminal:</strong> Run programs with <code>input()</code>, <code>scanf</code>, or <code>cin</code>. The terminal waits for you to type inputs line-by-line in real-time!
               </div>
 
               <div style={{ padding: '0.75rem', background: 'var(--success-bg)', borderRadius: '8px', border: '1px solid #a7f3d0' }}>
