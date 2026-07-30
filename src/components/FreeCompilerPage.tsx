@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import {
   Play, Terminal, Code2, AlertCircle, Save, Folder, FolderPlus,
-  FilePlus, Trash2, Edit3, ChevronRight, ChevronDown, FileCode, X, Check, Loader2
+  FilePlus, Trash2, Edit3, ChevronRight, ChevronDown, FileCode, X, Loader2, Download
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import AIHintAssistant from './AIHintAssistant';
@@ -37,11 +37,15 @@ const FreeCompilerPage: React.FC = () => {
   const [expandedFolderIds, setExpandedFolderIds] = useState<Record<string, boolean>>({ folder_src: true });
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
-  // Editing / Renaming states
+  // Modal / Dialog for New File / Folder Creation
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [createType, setCreateType] = useState<'file' | 'folder'>('file');
+  const [newItemName, setNewItemName] = useState<string>('');
+  const [targetFolderId, setTargetFolderId] = useState<string | null>(null);
+
+  // Inline Rename state
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameInput, setRenameInput] = useState<string>('');
-  const [isCreatingItem, setIsCreatingItem] = useState<'file' | 'folder' | null>(null);
-  const [newItemName, setNewItemName] = useState<string>('');
 
   // Code & Editor states
   const [code, setCode] = useState<string>('');
@@ -110,26 +114,49 @@ const FreeCompilerPage: React.FC = () => {
     setSaveStatus('saved');
   };
 
-  // Create new File or Folder
-  const handleCreateNewItem = async () => {
-    if (!newItemName.trim() || !isCreatingItem) return;
+  // Download active open file directly to local device disk
+  const handleDownloadFile = () => {
+    const current = files.find(f => f.id === activeFileId);
+    const fileName = current ? current.name : `code.${language === 'python' ? 'py' : language === 'cpp' ? 'cpp' : language === 'c' ? 'c' : 'java'}`;
+    const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Open modal to create file or folder
+  const openCreateModal = (type: 'file' | 'folder', parentFolderId: string | null = null) => {
+    setCreateType(type);
+    setNewItemName(type === 'file' ? 'script.py' : 'my_folder');
+    setTargetFolderId(parentFolderId !== null ? parentFolderId : selectedFolderId);
+    setShowCreateModal(true);
+  };
+
+  // Confirm creation of File or Folder
+  const handleConfirmCreate = async () => {
+    if (!newItemName.trim()) return;
     const name = newItemName.trim();
     const item = await createFileItem(
       userId,
       name,
-      isCreatingItem,
-      selectedFolderId,
-      isCreatingItem === 'file' ? (DEFAULT_TEMPLATES[inferLanguageFromName(name)] || '') : '',
-      isCreatingItem === 'file' ? inferLanguageFromName(name) : ''
+      createType,
+      targetFolderId,
+      createType === 'file' ? (DEFAULT_TEMPLATES[inferLanguageFromName(name)] || '# Write your code here\n') : '',
+      createType === 'file' ? inferLanguageFromName(name) : ''
     );
 
     setFiles(prev => [...prev, item]);
+    setShowCreateModal(false);
     setNewItemName('');
-    setIsCreatingItem(null);
 
     if (item.type === 'file') {
       setOpenTabIds(prev => prev.includes(item.id) ? prev : [...prev, item.id]);
       setActiveFileId(item.id);
+    } else {
+      setExpandedFolderIds(prev => ({ ...prev, [item.id]: true }));
     }
   };
 
@@ -264,20 +291,21 @@ const FreeCompilerPage: React.FC = () => {
             className={`ide-tree-node ${isActive ? 'active' : ''} ${isSelected ? 'selected' : ''}`}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer',
-              fontSize: '0.8rem', color: isActive ? 'var(--indigo)' : 'var(--text)',
+              padding: '0.4rem 0.65rem', borderRadius: '6px', cursor: 'pointer',
+              fontSize: '0.82rem', color: isActive ? 'var(--indigo)' : 'var(--text)',
               background: isActive ? 'var(--indigo-bg)' : isSelected ? 'var(--bg3)' : 'transparent',
-              transition: 'all 0.15s'
+              border: isActive ? '1px solid #c7d2fe' : '1px solid transparent',
+              transition: 'all 0.15s', marginBottom: '2px'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', overflow: 'hidden', whiteSpace: 'nowrap' }}>
               {isFolder ? (
                 <>
                   {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                  <Folder size={15} style={{ color: 'var(--gold)' }} />
+                  <Folder size={16} style={{ color: 'var(--gold)', flexShrink: 0 }} />
                 </>
               ) : (
-                <FileCode size={15} style={{ color: 'var(--indigo)' }} />
+                <FileCode size={16} style={{ color: 'var(--indigo)', flexShrink: 0 }} />
               )}
 
               {renamingId === item.id ? (
@@ -288,14 +316,23 @@ const FreeCompilerPage: React.FC = () => {
                   onChange={e => setRenameInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleConfirmRename(item.id)}
                   onBlur={() => handleConfirmRename(item.id)}
-                  style={{ fontSize: '0.78rem', padding: '0.1rem 0.3rem', borderRadius: '3px', border: '1px solid var(--indigo)', outline: 'none' }}
+                  style={{ fontSize: '0.8rem', padding: '0.15rem 0.35rem', borderRadius: '4px', border: '1px solid var(--indigo)', outline: 'none' }}
                 />
               ) : (
                 <span style={{ fontWeight: isFolder ? 700 : 500 }}>{item.name}</span>
               )}
             </div>
 
-            <div className="tree-action-btns" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.7 }}>
+            <div className="tree-action-btns" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              {isFolder && (
+                <button
+                  title="Add file inside this folder"
+                  onClick={e => { e.stopPropagation(); openCreateModal('file', item.id); }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--indigo)', padding: '2px' }}
+                >
+                  <FilePlus size={14} />
+                </button>
+              )}
               <button
                 title="Rename"
                 onClick={e => { e.stopPropagation(); setRenamingId(item.id); setRenameInput(item.name); }}
@@ -314,7 +351,7 @@ const FreeCompilerPage: React.FC = () => {
           </div>
 
           {isFolder && isExpanded && (
-            <div style={{ borderLeft: '1px solid var(--border)', marginLeft: '0.65rem' }}>
+            <div style={{ borderLeft: '1.5px solid var(--border)', marginLeft: '0.75rem', marginTop: '2px' }}>
               {renderTreeNodes(item.id, depth + 1)}
             </div>
           )}
@@ -324,6 +361,7 @@ const FreeCompilerPage: React.FC = () => {
   };
 
   const activeFile = files.find(f => f.id === activeFileId);
+  const folders = files.filter(f => f.type === 'folder');
 
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: 'calc(100vh - 70px)' }}>
@@ -346,13 +384,13 @@ const FreeCompilerPage: React.FC = () => {
               <span className="badge badge-indigo" style={{ fontSize: '0.6rem' }}>DB Synced ⚡</span>
             </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--muted)', margin: 0 }}>
-              Create folders, manage files, auto-save code, and compile in Python, C++, C, or Java.
+              Create folders & files, save to database, compile code, and download files directly to your device!
             </p>
           </div>
         </div>
 
         {/* Global IDE Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
           <select
             value={language}
             onChange={e => {
@@ -381,6 +419,16 @@ const FreeCompilerPage: React.FC = () => {
           </button>
 
           <button
+            onClick={handleDownloadFile}
+            className="btn btn-outline btn-sm"
+            title="Download this file to your computer/device"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+          >
+            <Download size={14} />
+            <span>Download File</span>
+          </button>
+
+          <button
             onClick={handleRunCode}
             disabled={isRunning}
             className="btn btn-primary btn-sm"
@@ -393,56 +441,42 @@ const FreeCompilerPage: React.FC = () => {
       </div>
 
       {/* ── IDE Body Grid Layout ──────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr 340px', gap: '1rem', flex: 1, minHeight: '620px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '270px 1fr 340px', gap: '1rem', flex: 1, minHeight: '620px' }}>
         
         {/* ── Left Sidebar: File Explorer Tree ─────────────────── */}
         <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border)', background: 'var(--bg2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--muted)' }}>
-              📁 Explorer
+              📁 File Explorer
             </span>
-            <div style={{ display: 'flex', gap: '0.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
               <button
-                title="New File"
-                onClick={() => { setIsCreatingItem('file'); setNewItemName(''); }}
-                style={{ padding: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--indigo)' }}
+                title="Create New File"
+                onClick={() => openCreateModal('file')}
+                style={{ padding: '0.3rem 0.5rem', background: 'var(--indigo-bg)', border: '1px solid #c7d2fe', borderRadius: '4px', cursor: 'pointer', color: 'var(--indigo)', fontSize: '0.72rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.2rem' }}
               >
-                <FilePlus size={16} />
+                <FilePlus size={14} /> + File
               </button>
               <button
-                title="New Folder"
-                onClick={() => { setIsCreatingItem('folder'); setNewItemName(''); }}
-                style={{ padding: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gold)' }}
+                title="Create New Folder"
+                onClick={() => openCreateModal('folder')}
+                style={{ padding: '0.3rem 0.5rem', background: 'var(--gold-bg)', border: '1px solid #fde68a', borderRadius: '4px', cursor: 'pointer', color: 'var(--gold)', fontSize: '0.72rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.2rem' }}
               >
-                <FolderPlus size={16} />
+                <FolderPlus size={14} /> + Folder
               </button>
             </div>
           </div>
 
-          {/* New Item Dialog Inline */}
-          {isCreatingItem && (
-            <div style={{ padding: '0.65rem', borderBottom: '1px solid var(--border)', background: 'var(--bg3)', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-              <input
-                type="text"
-                placeholder={isCreatingItem === 'file' ? 'filename.py' : 'Folder name'}
-                value={newItemName}
-                autoFocus
-                onChange={e => setNewItemName(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleCreateNewItem()}
-                style={{ flex: 1, padding: '0.3rem 0.5rem', fontSize: '0.75rem', borderRadius: '4px', border: '1px solid var(--border)', outline: 'none' }}
-              />
-              <button onClick={handleCreateNewItem} style={{ background: 'var(--indigo)', color: '#fff', border: 'none', padding: '0.3rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}>
-                <Check size={14} />
-              </button>
-              <button onClick={() => setIsCreatingItem(null)} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}>
-                <X size={14} />
-              </button>
-            </div>
-          )}
-
           {/* File Tree List */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '0.65rem' }}>
-            {renderTreeNodes(null, 0)}
+            {files.length === 0 ? (
+              <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--muted)', fontSize: '0.8rem' }}>
+                No files created yet.<br />
+                Click <strong>+ File</strong> above to create your first code file!
+              </div>
+            ) : (
+              renderTreeNodes(null, 0)
+            )}
           </div>
         </div>
 
@@ -461,8 +495,8 @@ const FreeCompilerPage: React.FC = () => {
                   key={file.id}
                   onClick={() => setActiveFileId(file.id)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.85rem',
-                    fontSize: '0.78rem', fontWeight: isActive ? 700 : 500, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 0.95rem',
+                    fontSize: '0.8rem', fontWeight: isActive ? 700 : 500, cursor: 'pointer',
                     background: isActive ? '#1e1e1e' : 'transparent', color: isActive ? '#6366f1' : '#a1a1aa',
                     borderRight: '1px solid #27272a', borderTop: isActive ? '2px solid #6366f1' : '2px solid transparent'
                   }}
@@ -561,6 +595,65 @@ const FreeCompilerPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* ── Create New File / Folder Modal ──────────────────────── */}
+      {showCreateModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.5rem', width: '100%', maxWidth: '420px', boxShadow: 'var(--shadow-lg)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {createType === 'file' ? <FilePlus size={18} style={{ color: 'var(--indigo)' }} /> : <FolderPlus size={18} style={{ color: 'var(--gold)' }} />}
+                Create New {createType === 'file' ? 'File' : 'Folder'}
+              </h3>
+              <button onClick={() => setShowCreateModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)' }}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: '0.35rem' }}>
+                  {createType === 'file' ? 'File Name (e.g. main.py, app.cpp, demo.java):' : 'Folder Name:'}
+                </label>
+                <input
+                  type="text"
+                  value={newItemName}
+                  autoFocus
+                  onChange={e => setNewItemName(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleConfirmCreate()}
+                  placeholder={createType === 'file' ? 'solution.py' : 'my_project'}
+                  style={{ width: '100%', padding: '0.6rem 0.8rem', fontSize: '0.85rem', borderRadius: 'var(--radius-sm)', border: '1.5px solid var(--border)', outline: 'none' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: '0.35rem' }}>
+                  Location:
+                </label>
+                <select
+                  value={targetFolderId || ''}
+                  onChange={e => setTargetFolderId(e.target.value ? e.target.value : null)}
+                  style={{ width: '100%', padding: '0.55rem 0.75rem', fontSize: '0.82rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg2)', color: 'var(--text)' }}
+                >
+                  <option value="">📁 Root Directory (Top Level)</option>
+                  {folders.map(f => (
+                    <option key={f.id} value={f.id}>📁 {f.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.65rem', marginTop: '0.5rem' }}>
+                <button className="btn btn-ghost btn-sm" onClick={() => setShowCreateModal(false)}>
+                  Cancel
+                </button>
+                <button className="btn btn-primary btn-sm" onClick={handleConfirmCreate}>
+                  Create {createType === 'file' ? 'File' : 'Folder'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating AI Assistant */}
       <AIHintAssistant
