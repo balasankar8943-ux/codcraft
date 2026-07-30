@@ -371,7 +371,7 @@ const QuestionPage: React.FC = () => {
           {/* Run */}
           <button onClick={runCode} disabled={isRunning || timeLeft <= 0}
             className="qp-run-btn"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.38rem 0.85rem', background: 'transparent', border: '1px solid #555', borderRadius: '6px', color: '#ccc', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', opacity: (isRunning || timeLeft <= 0) ? 0.5 : 1 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.38rem 0.85rem', background: 'transparent', border: '1px solid #555', borderRadius: '6px', color: '#ffffff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', opacity: (isRunning || timeLeft <= 0) ? 0.6 : 1 }}>
             <PlayIcon /> {isRunning ? 'Running…' : 'Run'}
           </button>
 
@@ -379,7 +379,7 @@ const QuestionPage: React.FC = () => {
           <button
             onClick={submitSolution}
             disabled={isRunning || isSubmitting || solved || !allPass || timeLeft <= 0}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.38rem 0.85rem', background: solved ? 'transparent' : allPass ? '#6366f1' : '#2a2a2a', border: `1px solid ${solved ? '#555' : allPass ? '#6366f1' : '#555'}`, borderRadius: '6px', color: solved ? '#888' : allPass ? '#fff' : '#555', fontSize: '0.78rem', fontWeight: 700, cursor: (solved || !allPass) ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', transition: 'all 0.18s' }}>
+            style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.38rem 0.85rem', background: solved ? 'transparent' : allPass ? '#6366f1' : '#2a2a2a', border: `1px solid ${solved ? '#555' : allPass ? '#6366f1' : '#555'}`, borderRadius: '6px', color: solved ? '#94a3b8' : '#ffffff', fontSize: '0.78rem', fontWeight: 700, cursor: (solved || !allPass) ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', transition: 'all 0.18s', opacity: (solved || !allPass) ? 0.75 : 1 }}>
             <CheckIcon /> {isSubmitting ? 'Submitting…' : solved ? 'Solved! ✓' : `Submit (${xpLabel})`}
           </button>
         </div>
@@ -564,7 +564,7 @@ const QuestionPage: React.FC = () => {
           onClick={runCode} 
           disabled={isRunning || timeLeft <= 0} 
           className="btn btn-outline" 
-          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.65rem 0' }}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.65rem 0', color: '#ffffff' }}
         >
           <PlayIcon /> {isRunning ? 'Running…' : 'Run Code'}
         </button>
@@ -572,7 +572,7 @@ const QuestionPage: React.FC = () => {
           onClick={submitSolution} 
           disabled={isRunning || isSubmitting || solved || !allPass || timeLeft <= 0}
           className={`btn ${solved ? 'btn-outline' : allPass ? 'btn-primary' : 'btn-outline'}`}
-          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', opacity: (solved || (!allPass && !solved)) ? 0.6 : 1, padding: '0.65rem 0' }}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', opacity: (solved || (!allPass && !solved)) ? 0.75 : 1, padding: '0.65rem 0', color: '#ffffff' }}
         >
           <CheckIcon /> {isSubmitting ? 'Submitting…' : solved ? 'Solved! ✓' : `Submit (${xpLabel})`}
         </button>

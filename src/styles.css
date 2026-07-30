@@ -1840,6 +1840,19 @@ img, svg, input, button, select, textarea {
   }
 }
 
+/* Ensure high-contrast white text color for bottom action bar buttons in dark theme */
+.qp-mobile-bottom-bar button,
+.sandbox-bottom-bar button,
+.qp-run-btn {
+  color: #ffffff !important;
+}
+
+.qp-mobile-bottom-bar button:disabled,
+.sandbox-bottom-bar button:disabled {
+  color: #ffffff !important;
+  opacity: 0.75 !important;
+}
+
 /* ── Question Card (list view) ────────────────────────────── */
 .question-card {
   background: var(--bg2);

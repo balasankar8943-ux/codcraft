@@ -543,7 +543,7 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
           onClick={executeCode}
           disabled={isRunning || isSubmitting || solved || timeLeft <= 0}
           className="btn btn-outline"
-          style={{ flex: 1, padding: '0.7rem' }}
+          style={{ flex: 1, padding: '0.7rem', color: '#ffffff' }}
         >
           <Play size={12} /> {isRunning ? 'Running...' : 'Run Code'}
         </button>
@@ -557,7 +557,7 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
             !outputs.every(o => o.status === 'pass')
           }
           className="btn btn-primary"
-          style={{ flex: 1, padding: '0.7rem' }}
+          style={{ flex: 1, padding: '0.7rem', color: '#ffffff' }}
         >
           <CheckCircle size={12} /> {isSubmitting ? 'Submitting...' : solved ? 'Solved!' : 'Submit Solution'}
         </button>
