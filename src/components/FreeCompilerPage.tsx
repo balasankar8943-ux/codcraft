@@ -4,7 +4,7 @@ import Editor from '@monaco-editor/react';
 import {
   Play, Terminal, Code2, AlertCircle, Save, Folder, FolderPlus,
   FilePlus, Trash2, Edit3, ChevronRight, ChevronDown, FileCode, X, Loader2, Download,
-  Copy, CheckCircle2, CornerDownLeft, Maximize2, Minimize2
+  Copy, CheckCircle2, CornerDownLeft, Maximize2, Minimize2, HelpCircle
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import AIHintAssistant from './AIHintAssistant';
@@ -31,6 +31,10 @@ const FreeCompilerPage: React.FC = () => {
   const { user } = useAuth();
   const userId = user?.id || 'sandbox_user_id';
 
+  // Screen width state for responsive view switching
+  const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth <= 768);
+  const [mobileTab, setMobileTab] = useState<'explorer' | 'editor' | 'console'>('editor');
+
   // File tree states
   const [files, setFiles] = useState<FileItem[]>([]);
   const [openTabIds, setOpenTabIds] = useState<string[]>([]);
@@ -38,11 +42,12 @@ const FreeCompilerPage: React.FC = () => {
   const [expandedFolderIds, setExpandedFolderIds] = useState<Record<string, boolean>>({ folder_src: true });
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
-  // Modal / Dialog for New File / Folder Creation
+  // Modal / Dialog states
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   const [createType, setCreateType] = useState<'file' | 'folder'>('file');
   const [newItemName, setNewItemName] = useState<string>('');
   const [targetFolderId, setTargetFolderId] = useState<string | null>(null);
+  const [showGuideModal, setShowGuideModal] = useState<boolean>(false);
 
   // Inline Rename state
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -63,6 +68,15 @@ const FreeCompilerPage: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
   const [isConsoleMaximized, setIsConsoleMaximized] = useState<boolean>(false);
   const editorRef = useRef<any>(null);
+
+  // Track window resizing
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Load user files on initial render or user change
   useEffect(() => {
@@ -159,6 +173,7 @@ const FreeCompilerPage: React.FC = () => {
     if (item.type === 'file') {
       setOpenTabIds(prev => prev.includes(item.id) ? prev : [...prev, item.id]);
       setActiveFileId(item.id);
+      if (isMobile) setMobileTab('editor');
     } else {
       setExpandedFolderIds(prev => ({ ...prev, [item.id]: true }));
     }
@@ -206,6 +221,7 @@ const FreeCompilerPage: React.FC = () => {
       setOpenTabIds(prev => [...prev, file.id]);
     }
     setActiveFileId(file.id);
+    if (isMobile) setMobileTab('editor');
   };
 
   // Close tab
@@ -226,6 +242,7 @@ const FreeCompilerPage: React.FC = () => {
     setStderr('');
     setExecTime(null);
     setConsoleTab('stdout');
+    if (isMobile) setMobileTab('console');
     const startTime = performance.now();
 
     try {
@@ -401,6 +418,13 @@ const FreeCompilerPage: React.FC = () => {
                 Cloud IDE Compiler
               </h1>
               <span className="badge badge-indigo" style={{ fontSize: '0.6rem' }}>DB Synced ⚡</span>
+              
+              <button
+                onClick={() => setShowGuideModal(true)}
+                style={{ background: 'rgba(99, 102, 241, 0.12)', border: '1px solid rgba(99, 102, 241, 0.3)', borderRadius: '20px', padding: '0.15rem 0.6rem', fontSize: '0.7rem', fontWeight: 700, color: 'var(--indigo)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+              >
+                <HelpCircle size={13} /> How to Use?
+              </button>
             </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--muted)', margin: 0 }}>
               Create folders & files, save to database, compile code, and download files directly to your device!
@@ -459,12 +483,36 @@ const FreeCompilerPage: React.FC = () => {
         </div>
       </div>
 
-      {/* ── IDE Body Grid Layout ──────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: isConsoleMaximized ? '1fr' : '260px 1fr 380px', gap: '1rem', flex: 1, minHeight: '620px' }}>
+      {/* ── Smartphone Touch View Switcher Tabs (Only visible on Mobile screens) ── */}
+      {isMobile && (
+        <div style={{ display: 'flex', background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+          <button
+            onClick={() => setMobileTab('explorer')}
+            style={{ flex: 1, padding: '0.6rem', fontSize: '0.8rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: mobileTab === 'explorer' ? 'var(--indigo-bg)' : 'transparent', color: mobileTab === 'explorer' ? 'var(--indigo)' : 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
+          >
+            <Folder size={15} /> 📁 Explorer
+          </button>
+          <button
+            onClick={() => setMobileTab('editor')}
+            style={{ flex: 1, padding: '0.6rem', fontSize: '0.8rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: mobileTab === 'editor' ? 'var(--indigo-bg)' : 'transparent', color: mobileTab === 'editor' ? 'var(--indigo)' : 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
+          >
+            <Code2 size={15} /> 💻 Code Editor
+          </button>
+          <button
+            onClick={() => setMobileTab('console')}
+            style={{ flex: 1, padding: '0.6rem', fontSize: '0.8rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: mobileTab === 'console' ? 'var(--indigo-bg)' : 'transparent', color: mobileTab === 'console' ? 'var(--indigo)' : 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
+          >
+            <Terminal size={15} /> 🖥️ Output
+          </button>
+        </div>
+      )}
+
+      {/* ── IDE Body Grid Layout (Desktop Side-by-Side / Mobile Responsive) ────── */}
+      <div className="ide-body-grid">
         
         {/* ── Left Sidebar: File Explorer Tree ─────────────────── */}
-        {!isConsoleMaximized && (
-          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {(!isMobile || mobileTab === 'explorer') && !isConsoleMaximized && (
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: '380px' }}>
             <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border)', background: 'var(--bg2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--muted)' }}>
                 📁 File Explorer
@@ -502,8 +550,8 @@ const FreeCompilerPage: React.FC = () => {
         )}
 
         {/* ── Middle Column: Tabs & Monaco Editor ─────────────── */}
-        {!isConsoleMaximized && (
-          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {(!isMobile || mobileTab === 'editor') && !isConsoleMaximized && (
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: '420px' }}>
             
             {/* File Tabs Bar */}
             <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: '#18181b', overflowX: 'auto' }}>
@@ -537,7 +585,7 @@ const FreeCompilerPage: React.FC = () => {
             </div>
 
             {/* Editor Container */}
-            <div style={{ flex: 1, position: 'relative', background: '#1e1e1e' }}>
+            <div style={{ flex: 1, position: 'relative', background: '#1e1e1e', minHeight: '380px' }}>
               <Editor
                 height="100%"
                 language={language === 'c' ? 'cpp' : language}
@@ -546,7 +594,7 @@ const FreeCompilerPage: React.FC = () => {
                 onChange={v => setCode(v || '')}
                 onMount={editor => { editorRef.current = editor; }}
                 options={{
-                  fontSize: 14,
+                  fontSize: isMobile ? 13 : 14,
                   fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace',
                   automaticLayout: true,
                   tabSize: 4,
@@ -562,162 +610,166 @@ const FreeCompilerPage: React.FC = () => {
         )}
 
         {/* ── Right Column: Clear & Dedicated Output Console Section ────────────── */}
-        <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
-          
-          {/* Console Header Bar */}
-          <div style={{ padding: '0.65rem 1rem', borderBottom: '1px solid #27272a', background: '#121215', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Terminal size={16} style={{ color: '#38bdf8' }} />
-              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#f4f4f5', letterSpacing: '0.04em' }}>
-                OUTPUT CONSOLE
-              </span>
-              
-              {/* Execution Status Badge */}
-              {isRunning ? (
-                <span style={{ fontSize: '0.68rem', background: '#f59e0b22', color: '#f59e0b', border: '1px solid #f59e0b55', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <Loader2 size={10} className="animate-spin" /> Executing…
-                </span>
-              ) : stderr ? (
-                <span style={{ fontSize: '0.68rem', background: '#ef444422', color: '#ef4444', border: '1px solid #ef444455', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700 }}>
-                  ❌ Error
-                </span>
-              ) : stdout ? (
-                <span style={{ fontSize: '0.68rem', background: '#22c55e22', color: '#22c55e', border: '1px solid #22c55e55', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700 }}>
-                  ✓ Clean Output
-                </span>
-              ) : (
-                <span style={{ fontSize: '0.68rem', background: '#27272a', color: '#a1a1aa', padding: '0.15rem 0.5rem', borderRadius: '20px' }}>
-                  ● Ready
-                </span>
-              )}
-            </div>
-
-            {/* Header Right Controls */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              {execTime && (
-                <span style={{ fontSize: '0.72rem', color: '#4ade80', fontFamily: 'var(--mono)', fontWeight: 700 }}>
-                  ⚡ {execTime}
-                </span>
-              )}
-              
-              <button
-                title="Copy Console Output"
-                onClick={handleCopyConsoleOutput}
-                style={{ background: 'none', border: 'none', color: copied ? '#4ade80' : '#a1a1aa', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.7rem' }}
-              >
-                {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
-              </button>
-
-              <button
-                title="Clear Output Console"
-                onClick={() => { setStdout(''); setStderr(''); setExecTime(null); }}
-                style={{ background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', padding: '0.2rem' }}
-              >
-                <Trash2 size={14} />
-              </button>
-
-              <button
-                title={isConsoleMaximized ? "Restore Layout" : "Maximize Console View"}
-                onClick={() => setIsConsoleMaximized(prev => !prev)}
-                style={{ background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', padding: '0.2rem' }}
-              >
-                {isConsoleMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Console Sub-Tabs Switcher */}
-          <div style={{ display: 'flex', background: '#121215', borderBottom: '1px solid #27272a' }}>
-            <button
-              onClick={() => setConsoleTab('stdout')}
-              style={{
-                flex: 1, padding: '0.45rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
-                border: 'none', cursor: 'pointer', background: consoleTab === 'stdout' ? '#09090b' : 'transparent',
-                color: consoleTab === 'stdout' ? '#38bdf8' : '#71717a',
-                borderBottom: consoleTab === 'stdout' ? '2px solid #38bdf8' : '2px solid transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem'
-              }}
-            >
-              <Terminal size={13} /> Output (stdout)
-            </button>
-            <button
-              onClick={() => setConsoleTab('stdin')}
-              style={{
-                flex: 1, padding: '0.45rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
-                border: 'none', cursor: 'pointer', background: consoleTab === 'stdin' ? '#09090b' : 'transparent',
-                color: consoleTab === 'stdin' ? '#fbbf24' : '#71717a',
-                borderBottom: consoleTab === 'stdin' ? '2px solid #fbbf24' : '2px solid transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem'
-              }}
-            >
-              <CornerDownLeft size={13} /> Input (stdin)
-            </button>
-            <button
-              onClick={() => setConsoleTab('stderr')}
-              style={{
-                flex: 1, padding: '0.45rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
-                border: 'none', cursor: 'pointer', background: consoleTab === 'stderr' ? '#09090b' : 'transparent',
-                color: consoleTab === 'stderr' ? '#ef4444' : '#71717a',
-                borderBottom: consoleTab === 'stderr' ? '2px solid #ef4444' : '2px solid transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem'
-              }}
-            >
-              <AlertCircle size={13} /> Stderr {stderr && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '14px', height: '14px', fontSize: '0.6rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>!</span>}
-            </button>
-          </div>
-
-          {/* Console Tab Content Area */}
-          <div style={{ flex: 1, padding: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.85rem', overflowY: 'auto' }}>
+        {(!isMobile || mobileTab === 'console' || isConsoleMaximized) && (
+          <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.3)', minHeight: '380px' }}>
             
-            {/* stdout view */}
-            {consoleTab === 'stdout' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <pre style={{
-                  flex: 1, minHeight: '220px', padding: '0.85rem', background: '#000000', color: '#38bdf8',
-                  borderRadius: '6px', border: '1px solid #1e293b', fontFamily: '"JetBrains Mono", Consolas, monospace',
-                  fontSize: '0.82rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', overflowY: 'auto'
-                }}>
-                  {stdout || (isRunning ? '⚡ Executing code on server...' : 'Click "Run Code" in top bar to compile & view terminal output here.')}
-                </pre>
-              </div>
-            )}
-
-            {/* stdin view */}
-            {consoleTab === 'stdin' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.75rem', color: '#a1a1aa', lineHeight: 1.4 }}>
-                  Enter inputs required by your program (e.g. input values for <code>scanf</code>, <code>cin</code>, or <code>input()</code>):
+            {/* Console Header Bar */}
+            <div style={{ padding: '0.65rem 1rem', borderBottom: '1px solid #27272a', background: '#121215', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Terminal size={16} style={{ color: '#38bdf8' }} />
+                <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#f4f4f5', letterSpacing: '0.04em' }}>
+                  OUTPUT CONSOLE
                 </span>
-                <textarea
-                  rows={8}
-                  placeholder={`Example input:\n5\n10 20 30 40 50`}
-                  value={stdin}
-                  onChange={e => setStdin(e.target.value)}
-                  style={{ width: '100%', flex: 1, padding: '0.75rem', fontSize: '0.82rem', fontFamily: 'var(--mono)', borderRadius: '6px', border: '1px solid #27272a', background: '#000000', color: '#f4f4f5', outline: 'none', resize: 'vertical' }}
-                />
-              </div>
-            )}
-
-            {/* stderr view */}
-            {consoleTab === 'stderr' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {stderr ? (
-                  <pre style={{
-                    flex: 1, minHeight: '220px', padding: '0.85rem', background: '#2a0808', color: '#fca5a5',
-                    borderRadius: '6px', border: '1px solid #7f1d1d', fontFamily: '"JetBrains Mono", Consolas, monospace',
-                    fontSize: '0.8rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', overflowY: 'auto'
-                  }}>
-                    {stderr}
-                  </pre>
+                
+                {/* Execution Status Badge */}
+                {isRunning ? (
+                  <span style={{ fontSize: '0.68rem', background: '#f59e0b22', color: '#f59e0b', border: '1px solid #f59e0b55', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <Loader2 size={10} className="animate-spin" /> Executing…
+                  </span>
+                ) : stderr ? (
+                  <span style={{ fontSize: '0.68rem', background: '#ef444422', color: '#ef4444', border: '1px solid #ef444455', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700 }}>
+                    ❌ Error
+                  </span>
+                ) : stdout ? (
+                  <span style={{ fontSize: '0.68rem', background: '#22c55e22', color: '#22c55e', border: '1px solid #22c55e55', padding: '0.15rem 0.5rem', borderRadius: '20px', fontWeight: 700 }}>
+                    ✓ Clean Output
+                  </span>
                 ) : (
-                  <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#71717a', fontSize: '0.8rem' }}>
-                    ✓ No errors or compilation warnings reported!
-                  </div>
+                  <span style={{ fontSize: '0.68rem', background: '#27272a', color: '#a1a1aa', padding: '0.15rem 0.5rem', borderRadius: '20px' }}>
+                    ● Ready
+                  </span>
                 )}
               </div>
-            )}
+
+              {/* Header Right Controls */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                {execTime && (
+                  <span style={{ fontSize: '0.72rem', color: '#4ade80', fontFamily: 'var(--mono)', fontWeight: 700 }}>
+                    ⚡ {execTime}
+                  </span>
+                )}
+                
+                <button
+                  title="Copy Console Output"
+                  onClick={handleCopyConsoleOutput}
+                  style={{ background: 'none', border: 'none', color: copied ? '#4ade80' : '#a1a1aa', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.7rem' }}
+                >
+                  {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+                </button>
+
+                <button
+                  title="Clear Output Console"
+                  onClick={() => { setStdout(''); setStderr(''); setExecTime(null); }}
+                  style={{ background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', padding: '0.2rem' }}
+                >
+                  <Trash2 size={14} />
+                </button>
+
+                {!isMobile && (
+                  <button
+                    title={isConsoleMaximized ? "Restore Layout" : "Maximize Console View"}
+                    onClick={() => setIsConsoleMaximized(prev => !prev)}
+                    style={{ background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', padding: '0.2rem' }}
+                  >
+                    {isConsoleMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Console Sub-Tabs Switcher */}
+            <div style={{ display: 'flex', background: '#121215', borderBottom: '1px solid #27272a' }}>
+              <button
+                onClick={() => setConsoleTab('stdout')}
+                style={{
+                  flex: 1, padding: '0.45rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
+                  border: 'none', cursor: 'pointer', background: consoleTab === 'stdout' ? '#09090b' : 'transparent',
+                  color: consoleTab === 'stdout' ? '#38bdf8' : '#71717a',
+                  borderBottom: consoleTab === 'stdout' ? '2px solid #38bdf8' : '2px solid transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem'
+                }}
+              >
+                <Terminal size={13} /> Output (stdout)
+              </button>
+              <button
+                onClick={() => setConsoleTab('stdin')}
+                style={{
+                  flex: 1, padding: '0.45rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
+                  border: 'none', cursor: 'pointer', background: consoleTab === 'stdin' ? '#09090b' : 'transparent',
+                  color: consoleTab === 'stdin' ? '#fbbf24' : '#71717a',
+                  borderBottom: consoleTab === 'stdin' ? '2px solid #fbbf24' : '2px solid transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem'
+                }}
+              >
+                <CornerDownLeft size={13} /> Input (stdin)
+              </button>
+              <button
+                onClick={() => setConsoleTab('stderr')}
+                style={{
+                  flex: 1, padding: '0.45rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
+                  border: 'none', cursor: 'pointer', background: consoleTab === 'stderr' ? '#09090b' : 'transparent',
+                  color: consoleTab === 'stderr' ? '#ef4444' : '#71717a',
+                  borderBottom: consoleTab === 'stderr' ? '2px solid #ef4444' : '2px solid transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem'
+                }}
+              >
+                <AlertCircle size={13} /> Stderr {stderr && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '14px', height: '14px', fontSize: '0.6rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>!</span>}
+              </button>
+            </div>
+
+            {/* Console Tab Content Area */}
+            <div style={{ flex: 1, padding: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.85rem', overflowY: 'auto' }}>
+              
+              {/* stdout view */}
+              {consoleTab === 'stdout' && (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <pre style={{
+                    flex: 1, minHeight: '220px', padding: '0.85rem', background: '#000000', color: '#38bdf8',
+                    borderRadius: '6px', border: '1px solid #1e293b', fontFamily: '"JetBrains Mono", Consolas, monospace',
+                    fontSize: '0.82rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', overflowY: 'auto'
+                  }}>
+                    {stdout || (isRunning ? '⚡ Executing code on server...' : 'Click "Run Code" in top bar to compile & view terminal output here.')}
+                  </pre>
+                </div>
+              )}
+
+              {/* stdin view */}
+              {consoleTab === 'stdin' && (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#a1a1aa', lineHeight: 1.4 }}>
+                    Enter inputs required by your program (e.g. input values for <code>scanf</code>, <code>cin</code>, or <code>input()</code>):
+                  </span>
+                  <textarea
+                    rows={8}
+                    placeholder={`Example input:\n5\n10 20 30 40 50`}
+                    value={stdin}
+                    onChange={e => setStdin(e.target.value)}
+                    style={{ width: '100%', flex: 1, padding: '0.75rem', fontSize: '0.82rem', fontFamily: 'var(--mono)', borderRadius: '6px', border: '1px solid #27272a', background: '#000000', color: '#f4f4f5', outline: 'none', resize: 'vertical' }}
+                  />
+                </div>
+              )}
+
+              {/* stderr view */}
+              {consoleTab === 'stderr' && (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  {stderr ? (
+                    <pre style={{
+                      flex: 1, minHeight: '220px', padding: '0.85rem', background: '#2a0808', color: '#fca5a5',
+                      borderRadius: '6px', border: '1px solid #7f1d1d', fontFamily: '"JetBrains Mono", Consolas, monospace',
+                      fontSize: '0.8rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', overflowY: 'auto'
+                    }}>
+                      {stderr}
+                    </pre>
+                  ) : (
+                    <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#71717a', fontSize: '0.8rem' }}>
+                      ✓ No errors or compilation warnings reported!
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* ── Create New File / Folder Modal ──────────────────────── */}
@@ -774,6 +826,50 @@ const FreeCompilerPage: React.FC = () => {
                   Create {createType === 'file' ? 'File' : 'Folder'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Quick How-to-Use Guide Modal ──────────────────────────── */}
+      {showGuideModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.75rem', width: '100%', maxWidth: '520px', boxShadow: 'var(--shadow-lg)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                💡 Quick Guide: How to Use Cloud IDE
+              </h3>
+              <button onClick={() => setShowGuideModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.85rem', lineHeight: 1.6, color: 'var(--text2)' }}>
+              <div style={{ padding: '0.75rem', background: 'var(--indigo-bg)', borderRadius: '8px', border: '1px solid #c7d2fe' }}>
+                <strong>1. 📁 Create Files & Folders:</strong> Click <strong>+ File</strong> or <strong>+ Folder</strong> in the Explorer sidebar. Type names like <code>main.py</code>, <code>app.cpp</code>, or <code>hello.java</code>.
+              </div>
+
+              <div style={{ padding: '0.75rem', background: 'var(--bg3)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                <strong>2. 💻 Write & Auto-Save Code:</strong> Code inside the Monaco editor automatically syncs and saves to your cloud database as you type!
+              </div>
+
+              <div style={{ padding: '0.75rem', background: 'var(--gold-bg)', borderRadius: '8px', border: '1px solid #fde68a' }}>
+                <strong>3. ⚡ Compile & Run:</strong> Click <strong>Run Code</strong> in the top bar to execute your file in Python, C++, C, or Java. View terminal output in the Output Console.
+              </div>
+
+              <div style={{ padding: '0.75rem', background: 'var(--success-bg)', borderRadius: '8px', border: '1px solid #a7f3d0' }}>
+                <strong>4. ⬇️ Download to Your Device:</strong> Click <strong>Download File</strong> to save any code file directly onto your phone or computer hard drive.
+              </div>
+
+              <div style={{ padding: '0.75rem', background: 'var(--bg2)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                <strong>5. 📱 Mobile & Desktop Friendly:</strong> On smartphones, switch between <strong>📁 Files</strong>, <strong>💻 Editor</strong>, and <strong>🖥️ Output</strong> tabs for easy touch navigation!
+              </div>
+            </div>
+
+            <div style={{ marginTop: '1.25rem', textAlign: 'right' }}>
+              <button className="btn btn-primary btn-sm" onClick={() => setShowGuideModal(false)}>
+                Got it, let's code! 🚀
+              </button>
             </div>
           </div>
         </div>

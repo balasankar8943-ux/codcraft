@@ -1853,6 +1853,29 @@ img, svg, input, button, select, textarea {
   opacity: 0.75 !important;
 }
 
+/* ── Mobile & Desktop Dual Layout Responsiveness for Cloud IDE ── */
+.ide-body-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr 380px;
+  gap: 1rem;
+  flex: 1;
+  min-height: 620px;
+}
+
+@media (max-width: 1024px) {
+  .ide-body-grid {
+    grid-template-columns: 220px 1fr 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ide-body-grid {
+    display: flex;
+    flex-direction: column;
+    min-height: 460px;
+  }
+}
+
 /* ── Question Card (list view) ────────────────────────────── */
 .question-card {
   background: var(--bg2);
