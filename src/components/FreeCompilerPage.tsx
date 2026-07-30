@@ -34,6 +34,7 @@ const FreeCompilerPage: React.FC = () => {
   // Screen width state for responsive view switching
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth <= 768);
   const [mobileTab, setMobileTab] = useState<'explorer' | 'editor' | 'console'>('editor');
+  const [useNativeMobileEditor, setUseNativeMobileEditor] = useState<boolean>(false);
 
   // File tree states
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -584,27 +585,72 @@ const FreeCompilerPage: React.FC = () => {
               })}
             </div>
 
+            {/* Mobile Editor Mode Toggle (shown on small screens) */}
+            {isMobile && (
+              <div style={{ padding: '0.35rem 0.75rem', background: '#121215', borderBottom: '1px solid #27272a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.72rem', color: '#a1a1aa' }}>
+                  📱 Smartphone Keyboard Mode:
+                </span>
+                <button
+                  onClick={() => setUseNativeMobileEditor(prev => !prev)}
+                  style={{ background: useNativeMobileEditor ? 'var(--indigo)' : 'var(--bg3)', color: useNativeMobileEditor ? '#fff' : 'var(--text)', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.2rem 0.5rem', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  {useNativeMobileEditor ? '📱 Native Touch (Active)' : '⚡ Monaco Editor'}
+                </button>
+              </div>
+            )}
+
             {/* Editor Container */}
-            <div style={{ flex: 1, position: 'relative', background: '#1e1e1e', minHeight: '380px' }}>
-              <Editor
-                height="100%"
-                language={language === 'c' ? 'cpp' : language}
-                theme="vs-dark"
-                value={code}
-                onChange={v => setCode(v || '')}
-                onMount={editor => { editorRef.current = editor; }}
-                options={{
-                  fontSize: isMobile ? 13 : 14,
-                  fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace',
-                  automaticLayout: true,
-                  tabSize: 4,
-                  padding: { top: 16, bottom: 16 },
-                  wordWrap: 'on',
-                  smoothScrolling: true,
-                  renderLineHighlight: 'all',
-                  bracketPairColorization: { enabled: true }
-                }}
-              />
+            <div
+              onClick={() => { if (editorRef.current) editorRef.current.focus(); }}
+              onTouchStart={() => { if (editorRef.current) editorRef.current.focus(); }}
+              style={{ flex: 1, position: 'relative', background: '#1e1e1e', minHeight: '380px', display: 'flex', flexDirection: 'column' }}
+            >
+              {isMobile && useNativeMobileEditor ? (
+                <textarea
+                  value={code}
+                  onChange={e => setCode(e.target.value)}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  placeholder="// Type or paste your code here on mobile..."
+                  style={{
+                    flex: 1, width: '100%', minHeight: '380px', padding: '1rem', background: '#1e1e1e',
+                    color: '#f4f4f5', fontFamily: '"JetBrains Mono", Consolas, monospace', fontSize: '0.9rem',
+                    lineHeight: 1.6, border: 'none', outline: 'none', resize: 'none'
+                  }}
+                />
+              ) : (
+                <Editor
+                  height="100%"
+                  language={language === 'c' ? 'cpp' : language}
+                  theme="vs-dark"
+                  value={code}
+                  onChange={v => setCode(v || '')}
+                  onMount={editor => {
+                    editorRef.current = editor;
+                    setTimeout(() => {
+                      try { editor.layout(); editor.focus(); } catch (e) {}
+                    }, 100);
+                  }}
+                  options={{
+                    fontSize: isMobile ? 14 : 14,
+                    lineHeight: isMobile ? 22 : 20,
+                    fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace',
+                    automaticLayout: true,
+                    tabSize: 4,
+                    padding: { top: 16, bottom: 16 },
+                    wordWrap: 'on',
+                    smoothScrolling: true,
+                    renderLineHighlight: 'all',
+                    bracketPairColorization: { enabled: true },
+                    domReadOnly: false,
+                    readOnly: false,
+                    fixedOverflowWidgets: true,
+                    scrollBeyondLastLine: false
+                  }}
+                />
+              )}
             </div>
           </div>
         )}
