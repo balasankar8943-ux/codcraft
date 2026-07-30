@@ -4,7 +4,8 @@ import Editor from '@monaco-editor/react';
 import {
   Play, Terminal, Code2, AlertCircle, Save, Folder, FolderPlus,
   FilePlus, Trash2, Edit3, ChevronRight, ChevronDown, FileCode, X, Loader2, Download,
-  Copy, CheckCircle2, CornerDownLeft, Maximize2, Minimize2, HelpCircle
+  Copy, CheckCircle2, CornerDownLeft, Maximize2, Minimize2, HelpCircle,
+  Scissors, ClipboardPaste
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import AIHintAssistant from './AIHintAssistant';
@@ -58,6 +59,7 @@ const FreeCompilerPage: React.FC = () => {
   const [code, setCode] = useState<string>('');
   const [language, setLanguage] = useState<string>('python');
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'dirty'>('saved');
+  const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
   // Execution states
   const [stdin, setStdin] = useState<string>('');
@@ -69,6 +71,7 @@ const FreeCompilerPage: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
   const [isConsoleMaximized, setIsConsoleMaximized] = useState<boolean>(false);
   const editorRef = useRef<any>(null);
+  const nativeTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Track window resizing
   useEffect(() => {
@@ -144,6 +147,80 @@ const FreeCompilerPage: React.FC = () => {
     a.download = fileName;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Clipboard Handlers: Copy, Cut, Paste
+  const handleCopyCode = async () => {
+    try {
+      let textToCopy = code;
+      if (editorRef.current) {
+        const selection = editorRef.current.getSelection();
+        if (selection && !selection.isEmpty()) {
+          textToCopy = editorRef.current.getModel().getValueInRange(selection);
+        }
+      } else if (nativeTextareaRef.current) {
+        const start = nativeTextareaRef.current.selectionStart;
+        const end = nativeTextareaRef.current.selectionEnd;
+        if (start !== end) {
+          textToCopy = code.substring(start, end);
+        }
+      }
+
+      await navigator.clipboard.writeText(textToCopy);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (e) {
+      alert("Unable to access clipboard. Please use Ctrl+C / Cmd+C.");
+    }
+  };
+
+  const handleCutCode = async () => {
+    try {
+      let textToCut = code;
+      if (editorRef.current) {
+        const selection = editorRef.current.getSelection();
+        if (selection && !selection.isEmpty()) {
+          textToCut = editorRef.current.getModel().getValueInRange(selection);
+          editorRef.current.executeEdits('cut', [{ range: selection, text: '' }]);
+        } else {
+          setCode('');
+        }
+      } else if (nativeTextareaRef.current) {
+        const start = nativeTextareaRef.current.selectionStart;
+        const end = nativeTextareaRef.current.selectionEnd;
+        if (start !== end) {
+          textToCut = code.substring(start, end);
+          setCode(prev => prev.substring(0, start) + prev.substring(end));
+        } else {
+          setCode('');
+        }
+      }
+      await navigator.clipboard.writeText(textToCut);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (e) {
+      alert("Unable to access clipboard. Please use Ctrl+X / Cmd+X.");
+    }
+  };
+
+  const handlePasteCode = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text) return;
+
+      if (editorRef.current) {
+        const selection = editorRef.current.getSelection();
+        if (selection) {
+          editorRef.current.executeEdits('paste', [{ range: selection, text }]);
+        } else {
+          setCode(prev => prev + text);
+        }
+      } else {
+        setCode(prev => prev + text);
+      }
+    } catch (e) {
+      alert("Clipboard access permission denied. Please press Ctrl+V (or Cmd+V) to paste directly into the editor.");
+    }
   };
 
   // Open modal to create file or folder
@@ -554,35 +631,63 @@ const FreeCompilerPage: React.FC = () => {
         {(!isMobile || mobileTab === 'editor') && !isConsoleMaximized && (
           <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: '420px' }}>
             
-            {/* File Tabs Bar */}
-            <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: '#18181b', overflowX: 'auto' }}>
-              {openTabIds.map(tId => {
-                const file = files.find(f => f.id === tId);
-                if (!file) return null;
-                const isActive = activeFileId === file.id;
+            {/* File Tabs Bar & Clipboard Action Controls */}
+            <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: '#18181b', overflowX: 'auto', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex' }}>
+                {openTabIds.map(tId => {
+                  const file = files.find(f => f.id === tId);
+                  if (!file) return null;
+                  const isActive = activeFileId === file.id;
 
-                return (
-                  <div
-                    key={file.id}
-                    onClick={() => setActiveFileId(file.id)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 0.95rem',
-                      fontSize: '0.8rem', fontWeight: isActive ? 700 : 500, cursor: 'pointer',
-                      background: isActive ? '#1e1e1e' : 'transparent', color: isActive ? '#6366f1' : '#a1a1aa',
-                      borderRight: '1px solid #27272a', borderTop: isActive ? '2px solid #6366f1' : '2px solid transparent'
-                    }}
-                  >
-                    <FileCode size={14} />
-                    <span>{file.name}</span>
-                    <button
-                      onClick={e => handleCloseTab(e, file.id)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', display: 'flex', alignItems: 'center', padding: '2px' }}
+                  return (
+                    <div
+                      key={file.id}
+                      onClick={() => setActiveFileId(file.id)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 0.95rem',
+                        fontSize: '0.8rem', fontWeight: isActive ? 700 : 500, cursor: 'pointer',
+                        background: isActive ? '#1e1e1e' : 'transparent', color: isActive ? '#6366f1' : '#a1a1aa',
+                        borderRight: '1px solid #27272a', borderTop: isActive ? '2px solid #6366f1' : '2px solid transparent'
+                      }}
                     >
-                      <X size={12} />
-                    </button>
-                  </div>
-                );
-              })}
+                      <FileCode size={14} />
+                      <span>{file.name}</span>
+                      <button
+                        onClick={e => handleCloseTab(e, file.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', display: 'flex', alignItems: 'center', padding: '2px' }}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Cut / Copy / Paste Clipboard Toolbar Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', paddingRight: '0.5rem', flexShrink: 0 }}>
+                <button
+                  onClick={handleCutCode}
+                  title="Cut selection (or all code)"
+                  style={{ background: '#27272a', border: 'none', color: '#e4e4e7', padding: '0.3rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                >
+                  <Scissors size={12} /> Cut
+                </button>
+                <button
+                  onClick={handleCopyCode}
+                  title="Copy selection (or all code)"
+                  style={{ background: '#27272a', border: 'none', color: copiedCode ? '#4ade80' : '#e4e4e7', padding: '0.3rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                >
+                  {copiedCode ? <CheckCircle2 size={12} /> : <Copy size={12} />}
+                  <span>{copiedCode ? 'Copied ✓' : 'Copy'}</span>
+                </button>
+                <button
+                  onClick={handlePasteCode}
+                  title="Paste from clipboard into editor"
+                  style={{ background: 'var(--indigo)', border: 'none', color: '#ffffff', padding: '0.3rem 0.55rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                >
+                  <ClipboardPaste size={12} /> Paste
+                </button>
+              </div>
             </div>
 
             {/* Mobile Editor Mode Toggle (shown on small screens) */}
@@ -608,6 +713,7 @@ const FreeCompilerPage: React.FC = () => {
             >
               {isMobile && useNativeMobileEditor ? (
                 <textarea
+                  ref={nativeTextareaRef}
                   value={code}
                   onChange={e => setCode(e.target.value)}
                   autoCapitalize="none"
@@ -646,6 +752,9 @@ const FreeCompilerPage: React.FC = () => {
                     bracketPairColorization: { enabled: true },
                     domReadOnly: false,
                     readOnly: false,
+                    contextmenu: true,
+                    selectOnLineNumbers: true,
+                    copyWithSyntaxHighlighting: true,
                     fixedOverflowWidgets: true,
                     scrollBeyondLastLine: false
                   }}
@@ -896,7 +1005,7 @@ const FreeCompilerPage: React.FC = () => {
               </div>
 
               <div style={{ padding: '0.75rem', background: 'var(--bg3)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <strong>2. 💻 Write & Auto-Save Code:</strong> Code inside the Monaco editor automatically syncs and saves to your cloud database as you type!
+                <strong>2. ✂️ Cut, Copy & Paste:</strong> Use the editor toolbar buttons (<strong>Cut</strong>, <strong>Copy</strong>, <strong>Paste</strong>) or press <code>Ctrl+C</code> / <code>Ctrl+V</code> / <code>Ctrl+X</code> (Cmd on Mac) to manage your code snippets!
               </div>
 
               <div style={{ padding: '0.75rem', background: 'var(--gold-bg)', borderRadius: '8px', border: '1px solid #fde68a' }}>
