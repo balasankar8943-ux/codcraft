@@ -6,7 +6,9 @@ import { useAuth } from './AuthProvider';
 
 const NAV = [
   { path: '/',             label: 'Practice Arena',  icon: '💻' },
+  { path: '/game-arena',   label: 'Game Arena',      icon: '🎮' },
   { path: '/compiler',     label: 'Cloud IDE',       icon: '⚡' },
+  { path: '/integrity-test', label: 'AI Integrity',  icon: '🛡️' },
   { path: '/mnc',          label: 'MNC Prep',         icon: '🏢' },
   { path: '/leaderboard',  label: 'Leaderboard',      icon: '🏆' },
   { path: '/certificates', label: 'My Certificates',  icon: '🎓' },
