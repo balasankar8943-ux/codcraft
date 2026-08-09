@@ -13,8 +13,6 @@ import QuestionPage     from './pages/QuestionPage';
 import AdminNotificationsPage from './pages/AdminNotificationsPage';
 
 import CompilerPage     from './pages/CompilerPage';
-
-import IntegrityTestPage from './pages/IntegrityTestPage';
 import GameArenaPage     from './pages/GameArenaPage';
 
 const App: React.FC = () => {
@@ -47,7 +45,6 @@ const App: React.FC = () => {
       {/* Section pages */}
       <Route path="/compiler"       element={<CompilerPage />} />
       <Route path="/game-arena"     element={<GameArenaPage />} />
-      <Route path="/integrity-test" element={<IntegrityTestPage />} />
       <Route path="/clash"        element={<Guard><PracticePage /></Guard>} />
       <Route path="/colleges"     element={<Guard><PracticePage /></Guard>} />
       <Route path="/mnc"          element={<Guard><MNCPage /></Guard>} />
