@@ -383,17 +383,23 @@ const FreeCompilerPage: React.FC = () => {
       const errText = resOutput.stderr || '';
       
       setStdout(outText);
-      setStderr(errText);
 
       // Detect if program requires interactive user input (e.g. EOFError, input prompt ending without newline, or stdin exhaustion)
-      const needsInput = errText.includes('EOFError') || 
-                         errText.includes('NoSuchElementException') || 
-                         (outText && !outText.endsWith('\n') && !errText);
+      const isEofWaiting = errText.includes('EOFError') || 
+                           errText.includes('NoSuchElementException') || 
+                           errText.includes('end of file') ||
+                           (outText && !outText.endsWith('\n') && !errText);
 
-      setIsWaitingForInput(Boolean(needsInput));
-
-      if (errText && !outText) {
-        setConsoleTab('stderr');
+      if (isEofWaiting) {
+        setIsWaitingForInput(true);
+        setConsoleTab('stdout'); // Always stay on Interactive Terminal so user can type!
+        setStderr(''); // Don't show red error tab since program is waiting for input
+      } else {
+        setIsWaitingForInput(false);
+        setStderr(errText);
+        if (errText && !outText) {
+          setConsoleTab('stderr');
+        }
       }
     } catch (err: any) {
       setStderr(err?.message || 'Execution error. Check code syntax or network connection.');
@@ -1030,30 +1036,49 @@ const FreeCompilerPage: React.FC = () => {
               
               {/* Interactive Terminal stdout view */}
               {consoleTab === 'stdout' && (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                  
+                  {/* Waiting for Input Notification Banner */}
+                  {isWaitingForInput && (
+                    <div style={{ padding: '0.55rem 0.85rem', background: '#1e1b4b', border: '1px solid #6366f1', borderRadius: '6px', color: '#c7d2fe', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                      <span style={{ fontSize: '1.1rem' }}>⌨️</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, color: '#a5b4fc', fontSize: '0.8rem' }}>Input Required</div>
+                        <div style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Your program is waiting for input (e.g. <code>input()</code> or <code>cin</code>). Enter a value below:</div>
+                      </div>
+                    </div>
+                  )}
+
                   <div style={{
                     flex: 1, minHeight: '240px', padding: '0.85rem', background: '#000000', color: '#38bdf8',
                     borderRadius: '6px', border: '1px solid #1e293b', fontFamily: '"JetBrains Mono", Consolas, monospace',
                     fontSize: '0.82rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', overflowY: 'auto', display: 'flex', flexDirection: 'column'
                   }}>
-                    <span>
-                      {stdout || (isRunning ? '⚡ Executing interactive program...' : 'Click "Run Code" in top bar to start terminal session.')}
-                    </span>
+                    {/* Previous Interactive Inputs History */}
+                    {interactiveQueue.map((inp, idx) => (
+                      <div key={idx} style={{ color: '#4ade80', fontFamily: 'inherit', marginBottom: '0.2rem' }}>
+                        <span style={{ color: '#818cf8', fontWeight: 700 }}>➜ </span>{inp}
+                      </div>
+                    ))}
+
+                    <div>
+                      {stdout || (isRunning ? '⚡ Executing interactive program...' : (isWaitingForInput ? '' : 'Click "Run Code" in top bar to start terminal session.'))}
+                    </div>
 
                     {/* Sequential Input Prompts & Real-Time Input Line */}
                     {(isRunning || isWaitingForInput || interactiveQueue.length > 0) && (
-                      <form onSubmit={handleSendLiveTerminalInput} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', background: '#09090b', padding: '0.4rem 0.6rem', borderRadius: '4px', border: '1px solid #334155' }}>
-                        <span style={{ color: '#818cf8', fontWeight: 700, fontSize: '0.8rem' }}>➜</span>
+                      <form onSubmit={handleSendLiveTerminalInput} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.65rem', background: '#111827', padding: '0.45rem 0.75rem', borderRadius: '6px', border: isWaitingForInput ? '1.5px solid #6366f1' : '1px solid #334155', boxShadow: isWaitingForInput ? '0 0 12px rgba(99,102,241,0.3)' : 'none' }}>
+                        <span style={{ color: isWaitingForInput ? '#a5b4fc' : '#818cf8', fontWeight: 700, fontSize: '0.85rem' }}>➜</span>
                         <input
                           type="text"
                           value={liveInputVal}
                           onChange={e => setLiveInputVal(e.target.value)}
-                          placeholder={isWaitingForInput ? "Type input & press Enter..." : "Enter next input..."}
+                          placeholder={isWaitingForInput ? "Type input value (e.g. 4) & press Enter..." : "Enter next input..."}
                           autoFocus
-                          style={{ flex: 1, background: 'transparent', border: 'none', color: '#f4f4f5', fontFamily: 'inherit', fontSize: '0.82rem', outline: 'none' }}
+                          style={{ flex: 1, background: 'transparent', border: 'none', color: '#f4f4f5', fontFamily: 'inherit', fontSize: '0.85rem', outline: 'none' }}
                         />
-                        <button type="submit" disabled={isRunning} style={{ background: 'var(--indigo)', color: '#fff', border: 'none', borderRadius: '3px', padding: '0.2rem 0.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.7rem', fontWeight: 700 }}>
-                          <Send size={11} /> Send
+                        <button type="submit" disabled={isRunning} className="btn btn-primary btn-xs" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.3rem 0.65rem', fontWeight: 700 }}>
+                          <Send size={12} /> Send Input
                         </button>
                       </form>
                     )}
