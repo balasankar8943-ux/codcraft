@@ -15,15 +15,17 @@ import {
 import type { FileItem } from '../services/fileService';
 
 const LANGUAGE_IDS: Record<string, number> = {
-  python: 71,
-  cpp: 54,
-  c: 50,
-  java: 62
+  python: 71,  // Python 3 with scientific libraries
+  cpp: 54,     // C++ (GCC)
+  c: 50,       // C (GCC)
+  java: 62     // Java (OpenJDK)
 };
 
 const DEFAULT_TEMPLATES: Record<string, string> = {
-  python: `# Free Interactive Python Playground\ndef main():\n    print("=== INTERACTIVE CALCULATOR ===")\n    op = input("Choose operation (1. Add, 2. Subtract, 3. Multiply): ")\n    num1 = float(input("Enter first number: "))\n    num2 = float(input("Enter second number: "))\n    \n    if op == '1':\n        print(f"Result: {num1} + {num2} = {num1 + num2}")\n    elif op == '2':\n        print(f"Result: {num1} - {num2} = {num1 - num2}")\n    elif op == '3':\n        print(f"Result: {num1} * {num2} = {num1 * num2}")\n    else:\n        print("Invalid operation selected.")\n\nif __name__ == "__main__":\n    main()\n`,
-  cpp: `// Free Interactive C++ Playground\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "=== C++ INTERACTIVE CALCULATOR ===" << endl;\n    int choice;\n    cout << "Select operation (1. Add, 2. Multiply): ";\n    cin >> choice;\n    \n    double a, b;\n    cout << "Enter first number: ";\n    cin >> a;\n    cout << "Enter second number: ";\n    cin >> b;\n    \n    if (choice == 1) cout << "Result: " << a + b << endl;\n    else cout << "Result: " << a * b << endl;\n    return 0;\n}\n`,
+  python: `# Free Interactive Python Playground\n# Pre-loaded with: NumPy, Pandas, SciPy, Math, and Standard Libraries\n\ndef main():\n    print("=== INTERACTIVE CALCULATOR ===")\n    op = input("Choose operation (1. Add, 2. Subtract, 3. Multiply): ")\n    num1 = float(input("Enter first number: "))\n    num2 = float(input("Enter second number: "))\n    \n    if op == '1':\n        print(f"Result: {num1} + {num2} = {num1 + num2}")\n    elif op == '2':\n        print(f"Result: {num1} - {num2} = {num1 - num2}")\n    elif op == '3':\n        print(f"Result: {num1} * {num2} = {num1 * num2}")\n    else:\n        print("Invalid operation selected.")\n\nif __name__ == "__main__":\n    main()\n`,
+  numpy: `# NumPy & Linear Algebra Demo\nimport numpy as np\n\n# Create 2D Matrix\nA = np.array([[4, 2, 1],\n              [2, 5, 3],\n              [1, 3, 6]])\n\nB = np.array([10, 20, 30])\n\nprint("=== MATRIX OPERATIONS ===")\nprint("Matrix A:\\n", A)\nprint("\\nDeterminant of A:", round(np.linalg.det(A), 4))\nprint("Trace of A:", np.trace(A))\nprint("Inverse of A:\\n", np.linalg.inv(A))\n\n# Solve linear system Ax = B\nx = np.linalg.solve(A, B)\nprint("\\nSolution x for A·x = B:", x)\n`,
+  pandas: `# Pandas Data Analysis Demo\nimport pandas as pd\nimport numpy as np\n\n# Sample Student Dataset\ndata = {\n    'RollNo': [101, 102, 103, 104, 105],\n    'Name': ['Ananya', 'Rahul', 'Sneha', 'Midhun', 'Diya'],\n    'Branch': ['CSE', 'ECE', 'CSE', 'EEE', 'IT'],\n    'CGPA': [9.4, 8.2, 9.1, 7.8, 8.9],\n    'Attendance_%': [95, 88, 92, 80, 96]\n}\n\ndf = pd.DataFrame(data)\n\nprint("=== KTU STUDENT PERFORMANCE ===")\nprint(df)\n\nprint("\\n=== SUMMARY STATISTICS ===")\nprint(f"Average CGPA: {df['CGPA'].mean():.2f}")\nprint(f"Top Performer:\\n{df.loc[df['CGPA'].idxmax()]}")\n`,
+  cpp: `// Free Interactive C++ Playground\n#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    cout << "=== C++ INTERACTIVE CALCULATOR ===" << endl;\n    int choice;\n    cout << "Select operation (1. Add, 2. Multiply): ";\n    cin >> choice;\n    \n    double a, b;\n    cout << "Enter first number: ";\n    cin >> a;\n    cout << "Enter second number: ";\n    cin >> b;\n    \n    if (choice == 1) cout << "Result: " << a + b << endl;\n    else cout << "Result: " << a * b << endl;\n    return 0;\n}\n`,
   c: `/* Free Interactive C Playground */\n#include <stdio.h>\n\nint main() {\n    printf("=== C INTERACTIVE PROGRAM ===\\n");\n    int a, b;\n    printf("Enter first integer: ");\n    scanf("%d", &a);\n    printf("Enter second integer: ");\n    scanf("%d", &b);\n    printf("Sum: %d + %d = %d\\n", a, b, a + b);\n    return 0;\n}\n`,
   java: `// Free Interactive Java Playground\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.println("=== JAVA INTERACTIVE PROGRAM ===");\n        System.out.print("Enter your name: ");\n        String name = sc.nextLine();\n        System.out.print("Enter your age: ");\n        int age = sc.nextInt();\n        System.out.println("Hello " + name + "! Next year you will be " + (age + 1) + " years old.");\n    }\n}\n`
 };
@@ -146,6 +148,15 @@ const FreeCompilerPage: React.FC = () => {
     await updateFileItem(activeFileId, userId, { content: code, language });
     setFiles(prev => prev.map(f => f.id === activeFileId ? { ...f, content: code, language } : f));
     setSaveStatus('saved');
+  };
+
+  // Change active language
+  const handleLanguageChange = (newLang: string) => {
+    setLanguage(newLang);
+    if (activeFileId) {
+      updateFileItem(activeFileId, userId, { language: newLang });
+      setFiles(prev => prev.map(f => f.id === activeFileId ? { ...f, language: newLang } : f));
+    }
   };
 
   // Download active open file directly to local device disk
@@ -363,8 +374,10 @@ const FreeCompilerPage: React.FC = () => {
             headers: { 'content-type': 'application/json' },
             body
           });
-          const data = await pubRes.json();
-          resOutput = { stdout: data.stdout || '', stderr: data.stderr || data.compile_output || '' };
+          if (pubRes.ok) {
+            const data = await pubRes.json();
+            resOutput = { stdout: data.stdout || '', stderr: data.stderr || data.compile_output || '' };
+          }
         }
       } else {
         const pubRes = await fetch('https://ce.judge0.com/submissions?base64_encoded=false&wait=true', {
@@ -372,8 +385,33 @@ const FreeCompilerPage: React.FC = () => {
           headers: { 'content-type': 'application/json' },
           body
         });
-        const data = await pubRes.json();
-        resOutput = { stdout: data.stdout || '', stderr: data.stderr || data.compile_output || '' };
+        if (pubRes.ok) {
+          const data = await pubRes.json();
+          resOutput = { stdout: data.stdout || '', stderr: data.stderr || data.compile_output || '' };
+        }
+      }
+
+      // Secondary High-Performance Piston Fallback for Scientific Libraries (NumPy, Pandas, SciPy)
+      if (!resOutput.stdout && !resOutput.stderr) {
+        try {
+          const pistonLang = language === 'cpp' ? 'c++' : language;
+          const pRes = await fetch('https://emkc.org/api/v2/piston/execute', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              language: pistonLang,
+              version: '*',
+              files: [{ content: code }],
+              stdin: inputBuffer
+            })
+          });
+          if (pRes.ok) {
+            const pData = await pRes.json();
+            if (pData.run) {
+              resOutput = { stdout: pData.run.stdout || '', stderr: pData.run.stderr || '' };
+            }
+          }
+        } catch (e) {}
       }
 
       const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
@@ -565,20 +603,40 @@ const FreeCompilerPage: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
           <select
             value={language}
-            onChange={e => {
-              const newLang = e.target.value;
-              setLanguage(newLang);
-              if (activeFileId) {
-                updateFileItem(activeFileId, userId, { language: newLang });
-                setFiles(prev => prev.map(f => f.id === activeFileId ? { ...f, language: newLang } : f));
-              }
-            }}
-            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', fontWeight: 600, background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', color: 'var(--text)', cursor: 'pointer' }}
+            onChange={e => handleLanguageChange(e.target.value)}
+            className="select"
+            style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem', fontWeight: 600, borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
           >
-            <option value="python">🐍 Python 3</option>
+            <option value="python">🐍 Python 3 (NumPy/Pandas)</option>
             <option value="cpp">⚡ C++ (GCC)</option>
             <option value="c">⚙️ C (GCC)</option>
-            <option value="java">☕ Java</option>
+            <option value="java">☕ Java (OpenJDK)</option>
+          </select>
+
+          {/* Quick Snippet / Scientific Template Dropdown */}
+          <select
+            onChange={e => {
+              if (e.target.value && DEFAULT_TEMPLATES[e.target.value]) {
+                const templ = DEFAULT_TEMPLATES[e.target.value];
+                setCode(templ);
+                if (e.target.value === 'numpy' || e.target.value === 'pandas') {
+                  setLanguage('python');
+                } else if (DEFAULT_TEMPLATES[e.target.value]) {
+                  setLanguage(e.target.value);
+                }
+              }
+            }}
+            defaultValue=""
+            className="select"
+            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', fontWeight: 600, background: 'var(--bg2)', color: 'var(--indigo)', border: '1px solid #c7d2fe', borderRadius: 'var(--radius-sm)' }}
+          >
+            <option value="" disabled>📋 Load Snippet / Template...</option>
+            <option value="python">🐍 Python: Interactive Calculator</option>
+            <option value="numpy">🔢 Python: NumPy & Linear Algebra</option>
+            <option value="pandas">📊 Python: Pandas Data Analysis</option>
+            <option value="cpp">⚡ C++: Interactive Program</option>
+            <option value="c">⚙️ C: Interactive Input</option>
+            <option value="java">☕ Java: Interactive Scanner</option>
           </select>
 
           <button
@@ -597,17 +655,17 @@ const FreeCompilerPage: React.FC = () => {
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
           >
             <Download size={14} />
-            <span>Download File</span>
+            <span>Download</span>
           </button>
 
           <button
             onClick={handleRunCode}
             disabled={isRunning}
             className="btn btn-primary btn-sm"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 800 }}
           >
             <Play size={14} />
-            <span>{isRunning ? 'Running…' : 'Run Code'}</span>
+            <span>{isRunning ? 'Running…' : 'Run Code (F5)'}</span>
           </button>
         </div>
       </div>
