@@ -854,12 +854,15 @@ const FreeCompilerPage: React.FC = () => {
                       monaco.editor.remeasureFonts();
                       editor.layout();
                       editor.focus();
+                      const pos = editor.getPosition();
+                      if (!pos) editor.setPosition({ lineNumber: 1, column: 1 });
                     } catch (e) {}
 
                     setTimeout(() => {
                       try {
                         monaco.editor.remeasureFonts();
                         editor.layout();
+                        editor.focus();
                       } catch (e) {}
                     }, 100);
                   }}
@@ -878,10 +881,11 @@ const FreeCompilerPage: React.FC = () => {
                     trimAutoWhitespace: true,
                     formatOnType: true,
                     formatOnPaste: true,
-                    cursorBlinking: 'smooth',
-                    cursorSmoothCaretAnimation: 'on',
+                    cursorBlinking: 'blink',
+                    cursorSmoothCaretAnimation: 'off',
                     cursorStyle: 'line',
-                    cursorWidth: 2,
+                    cursorWidth: 3,
+                    cursorSurroundingLines: 2,
                     padding: { top: 16, bottom: 16 },
                     wordWrap: 'on',
                     smoothScrolling: true,

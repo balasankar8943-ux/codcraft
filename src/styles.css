@@ -48,7 +48,7 @@
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { height:100%; scroll-behavior:smooth; }
 
-/* ── Monaco Editor Precise Typography & Alignment Fix ──────────────── */
+/* ── Monaco Editor Precise Typography & Cursor Visibility ──────────────── */
 .monaco-editor,
 .monaco-editor .view-lines,
 .monaco-editor .view-line,
@@ -60,6 +60,30 @@ html { height:100%; scroll-behavior:smooth; }
   word-spacing: 0px !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
+}
+
+.monaco-editor .cursors-layer {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 10 !important;
+}
+
+.monaco-editor .cursors-layer .cursor {
+  position: absolute !important;
+  box-sizing: content-box !important;
+  visibility: visible !important;
+  display: block !important;
+  width: 2.5px !important;
+  background-color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+  opacity: 1 !important;
+}
+
+.monaco-editor.vs-dark .cursors-layer .cursor {
+  background-color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
 }
 
 body {
