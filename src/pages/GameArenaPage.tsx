@@ -309,15 +309,46 @@ const GameArenaPage: React.FC = () => {
                   theme="vs-dark"
                   value={code}
                   onChange={v => setCode(v || '')}
+                  onMount={(editor, monaco) => {
+                    try {
+                      monaco.editor.remeasureFonts();
+                      editor.layout();
+                      editor.focus();
+                    } catch (e) {}
+
+                    setTimeout(() => {
+                      try {
+                        monaco.editor.remeasureFonts();
+                        editor.layout();
+                      } catch (e) {}
+                    }, 100);
+                  }}
                   options={{
-                    fontSize: 13,
-                    fontFamily: '"JetBrains Mono", Consolas, monospace',
+                    fontSize: 14,
+                    lineHeight: 22,
+                    fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
+                    fontLigatures: false,
+                    letterSpacing: 0,
                     automaticLayout: true,
                     tabSize: 4,
-                    padding: { top: 10, bottom: 10 },
+                    insertSpaces: true,
+                    detectIndentation: false,
+                    autoIndent: 'full',
+                    useTabStops: true,
+                    trimAutoWhitespace: true,
+                    formatOnType: true,
+                    formatOnPaste: true,
+                    cursorBlinking: 'smooth',
+                    cursorSmoothCaretAnimation: 'on',
+                    cursorStyle: 'line',
+                    cursorWidth: 2,
+                    padding: { top: 12, bottom: 12 },
                     wordWrap: 'on',
                     bracketPairColorization: { enabled: true },
-                    minimap: { enabled: false }
+                    minimap: { enabled: false },
+                    renderLineHighlight: 'all',
+                    scrollBeyondLastLine: false,
+                    fixedOverflowWidgets: true
                   }}
                 />
               ) : (

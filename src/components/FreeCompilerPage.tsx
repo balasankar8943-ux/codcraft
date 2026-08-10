@@ -850,16 +850,38 @@ const FreeCompilerPage: React.FC = () => {
                       }
                     });
 
+                    try {
+                      monaco.editor.remeasureFonts();
+                      editor.layout();
+                      editor.focus();
+                    } catch (e) {}
+
                     setTimeout(() => {
-                      try { editor.layout(); editor.focus(); } catch (e) {}
+                      try {
+                        monaco.editor.remeasureFonts();
+                        editor.layout();
+                      } catch (e) {}
                     }, 100);
                   }}
                   options={{
-                    fontSize: isMobile ? 14 : 14,
-                    lineHeight: isMobile ? 22 : 20,
-                    fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace',
+                    fontSize: 14,
+                    lineHeight: 22,
+                    fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
+                    fontLigatures: false,
+                    letterSpacing: 0,
                     automaticLayout: true,
                     tabSize: 4,
+                    insertSpaces: true,
+                    detectIndentation: false,
+                    autoIndent: 'full',
+                    useTabStops: true,
+                    trimAutoWhitespace: true,
+                    formatOnType: true,
+                    formatOnPaste: true,
+                    cursorBlinking: 'smooth',
+                    cursorSmoothCaretAnimation: 'on',
+                    cursorStyle: 'line',
+                    cursorWidth: 2,
                     padding: { top: 16, bottom: 16 },
                     wordWrap: 'on',
                     smoothScrolling: true,

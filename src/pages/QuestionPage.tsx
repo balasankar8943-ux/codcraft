@@ -515,37 +515,51 @@ const QuestionPage: React.FC = () => {
             theme="vs-dark"
             value={code}
             onChange={v => setCode(v || '')}
-            onMount={(editor) => {
+            onMount={(editor, monaco) => {
               editorRef.current = editor;
-              setTimeout(() => {
+              try {
+                monaco.editor.remeasureFonts();
                 editor.layout();
+                editor.focus();
+              } catch (e) {}
+
+              setTimeout(() => {
+                try {
+                  monaco.editor.remeasureFonts();
+                  editor.layout();
+                } catch (e) {}
               }, 100);
             }}
             options={{
-              minimap: { enabled: window.innerWidth > 1024 },
-              fontSize: window.innerWidth < 768 ? 16 : 14,
-              lineHeight: window.innerWidth < 768 ? 24 : 20,
-              fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace',
+              minimap: { enabled: false },
+              fontSize: 14,
+              lineHeight: 22,
+              fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
+              fontLigatures: false,
+              letterSpacing: 0,
               automaticLayout: true,
               tabSize: 4,
-              padding: { top: 20, bottom: 20 },
+              insertSpaces: true,
+              detectIndentation: false,
+              autoIndent: 'full',
+              useTabStops: true,
+              trimAutoWhitespace: true,
+              formatOnType: true,
+              formatOnPaste: true,
+              cursorBlinking: 'smooth',
+              cursorSmoothCaretAnimation: 'on',
+              cursorStyle: 'line',
+              cursorWidth: 2,
+              padding: { top: 16, bottom: 16 },
               readOnly: (timeLeft <= 0),
               wordWrap: 'on',
               lineNumbersMinChars: 3,
               scrollBeyondLastLine: false,
               smoothScrolling: true,
-              cursorBlinking: 'blink',
-              cursorWidth: window.innerWidth < 768 ? 3 : 2,
-              cursorStyle: 'line',
               renderLineHighlight: 'all',
               bracketPairColorization: { enabled: true },
               dragAndDrop: false,
-              scrollbar: {
-                vertical: 'visible',
-                horizontal: 'visible',
-                verticalScrollbarSize: window.innerWidth < 768 ? 10 : 8,
-                horizontalScrollbarSize: window.innerWidth < 768 ? 10 : 8
-              }
+              fixedOverflowWidgets: true
             }}
           />
         </div>

@@ -415,22 +415,47 @@ const CodeSandbox: React.FC<Props> = ({ question, onSolved, isActive }) => {
               const draftKey = `codcraft_draft_${user?.id || 'guest'}_${question.id}_${language}`;
               localStorage.setItem(draftKey, val);
             }}
-            onMount={(editor) => {
+            onMount={(editor, monaco) => {
               editorRef.current = editor;
-              setTimeout(() => {
+              try {
+                monaco.editor.remeasureFonts();
                 editor.layout();
+              } catch (e) {}
+              setTimeout(() => {
+                try {
+                  monaco.editor.remeasureFonts();
+                  editor.layout();
+                } catch (e) {}
               }, 100);
             }}
             options={{
               minimap: { enabled: false },
-              fontSize: 13,
-              fontFamily: 'JetBrains Mono',
+              fontSize: 14,
+              lineHeight: 22,
+              fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
+              fontLigatures: false,
+              letterSpacing: 0,
               automaticLayout: true,
               tabSize: 4,
-              padding: { top: 12 },
+              insertSpaces: true,
+              detectIndentation: false,
+              autoIndent: 'full',
+              useTabStops: true,
+              trimAutoWhitespace: true,
+              formatOnType: true,
+              formatOnPaste: true,
+              cursorBlinking: 'smooth',
+              cursorSmoothCaretAnimation: 'on',
+              cursorStyle: 'line',
+              cursorWidth: 2,
+              padding: { top: 12, bottom: 12 },
               readOnly: timeLeft <= 0,
               wordWrap: 'on',
-              lineNumbersMinChars: 3
+              lineNumbersMinChars: 3,
+              renderLineHighlight: 'all',
+              bracketPairColorization: { enabled: true },
+              scrollBeyondLastLine: false,
+              fixedOverflowWidgets: true
             }}
           />
         </div>

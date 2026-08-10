@@ -48,6 +48,20 @@
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { height:100%; scroll-behavior:smooth; }
 
+/* ── Monaco Editor Precise Typography & Alignment Fix ──────────────── */
+.monaco-editor,
+.monaco-editor .view-lines,
+.monaco-editor .view-line,
+.monaco-editor .margin,
+.monaco-editor .monaco-editor-background,
+.monaco-editor textarea {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace !important;
+  letter-spacing: 0px !important;
+  word-spacing: 0px !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
 body {
   font-family: var(--font);
   background-color: var(--bg);
