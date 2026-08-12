@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import AIHintAssistant from './AIHintAssistant';
+import { runPythonWithPyodide } from '../services/pyodideRunner';
 import {
   fetchUserFiles, createFileItem, updateFileItem, deleteFileItem, inferLanguageFromName
 } from '../services/fileService';
@@ -336,6 +337,7 @@ const FreeCompilerPage: React.FC = () => {
   };
 
   // Run Code via Judge0 API with Interactive Session support
+  // Run Code via Judge0 API with Interactive Session support & In-Browser Pyodide WebAssembly Kernel
   const executeCodeWithInputs = async (inputsList: string[]) => {
     if (!code) return;
     setIsRunning(true);
@@ -344,13 +346,52 @@ const FreeCompilerPage: React.FC = () => {
     const startTime = performance.now();
 
     try {
-      const apiKey = (import.meta as any).env?.VITE_JUDGE0_API_KEY;
-      const langId = LANGUAGE_IDS[language] || 71;
-      let resOutput = { stdout: '', stderr: '' };
-
       const inputBuffer = inputsList.length > 0
         ? inputsList.join('\n') + '\n'
         : (stdin ? stdin : '');
+
+      // Check if Python code uses scientific libraries (NumPy, Pandas, SciPy, Matplotlib, SymPy, Sklearn)
+      const isScientificPython = language === 'python' && 
+        (code.includes('pandas') || code.includes('numpy') || code.includes('scipy') || 
+         code.includes('matplotlib') || code.includes('sklearn') || code.includes('sympy') || code.includes('seaborn'));
+
+      if (isScientificPython) {
+        setStdout('⚡ Initializing Python 3.12 WebAssembly with NumPy & Pandas...');
+        const pyResult = await runPythonWithPyodide(code, inputBuffer, (status) => {
+          setStdout(status);
+        });
+
+        const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+        setExecTime(`${elapsed}s`);
+        
+        const outText = pyResult.stdout || (pyResult.stderr ? '' : '(Program executed cleanly with no output)');
+        const errText = pyResult.stderr || '';
+
+        setStdout(outText);
+
+        const isEofWaiting = errText.includes('EOFError') || 
+                             errText.includes('NoSuchElementException') || 
+                             errText.includes('end of file') ||
+                             (outText && !outText.endsWith('\n') && !errText);
+
+        if (isEofWaiting) {
+          setIsWaitingForInput(true);
+          setConsoleTab('stdout');
+          setStderr('');
+        } else {
+          setIsWaitingForInput(false);
+          setStderr(errText);
+          if (errText && !outText) {
+            setConsoleTab('stderr');
+          }
+        }
+        return;
+      }
+
+      // Standard Execution via Judge0
+      const apiKey = (import.meta as any).env?.VITE_JUDGE0_API_KEY;
+      const langId = LANGUAGE_IDS[language] || 71;
+      let resOutput = { stdout: '', stderr: '' };
 
       const body = JSON.stringify({ source_code: code, language_id: langId, stdin: inputBuffer });
 
@@ -391,27 +432,11 @@ const FreeCompilerPage: React.FC = () => {
         }
       }
 
-      // Secondary High-Performance Piston Fallback for Scientific Libraries (NumPy, Pandas, SciPy)
-      if (!resOutput.stdout && !resOutput.stderr) {
-        try {
-          const pistonLang = language === 'cpp' ? 'c++' : language;
-          const pRes = await fetch('https://emkc.org/api/v2/piston/execute', {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-              language: pistonLang,
-              version: '*',
-              files: [{ content: code }],
-              stdin: inputBuffer
-            })
-          });
-          if (pRes.ok) {
-            const pData = await pRes.json();
-            if (pData.run) {
-              resOutput = { stdout: pData.run.stdout || '', stderr: pData.run.stderr || '' };
-            }
-          }
-        } catch (e) {}
+      // If remote sandbox failed with ModuleNotFoundError, auto-fallback to Pyodide!
+      if (language === 'python' && resOutput.stderr && resOutput.stderr.includes('ModuleNotFoundError')) {
+        setStdout('⚡ Switching to Python 3.12 WebAssembly Kernel with NumPy & Pandas...');
+        const pyResult = await runPythonWithPyodide(code, inputBuffer, (status) => setStdout(status));
+        resOutput = { stdout: pyResult.stdout, stderr: pyResult.stderr };
       }
 
       const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
@@ -440,6 +465,16 @@ const FreeCompilerPage: React.FC = () => {
         }
       }
     } catch (err: any) {
+      // Final attempt with Pyodide for Python if network fails
+      if (language === 'python') {
+        try {
+          const inputBuffer = inputsList.length > 0 ? inputsList.join('\n') + '\n' : (stdin ? stdin : '');
+          const pyResult = await runPythonWithPyodide(code, inputBuffer);
+          setStdout(pyResult.stdout);
+          setStderr(pyResult.stderr);
+          return;
+        } catch (pe) {}
+      }
       setStderr(err?.message || 'Execution error. Check code syntax or network connection.');
       setConsoleTab('stderr');
     } finally {
